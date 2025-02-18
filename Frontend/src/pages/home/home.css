@@ -1,0 +1,32 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: sans-serif;
+}
+
+.main-container {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+}
+
+.sidebar {
+    background-color: #333;
+    color: white;
+    min-height: 100vh;
+    padding-top: 2rem;
+}
+
+.main {
+    flex-grow: 1;
+    background-color: #f4f4f4;
+    padding: 1.5rem;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+}

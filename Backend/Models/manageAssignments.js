@@ -10,7 +10,7 @@ const response = {
 
 const manageAssignmentsModel = {
     get: async (assignmentID) => {
-        await dbPool.connect();
+        const dbClient = await dbPool.connect();
 
         const query = `
         SELECT *
@@ -19,7 +19,7 @@ const manageAssignmentsModel = {
         `;
 
         try {
-            const results = await dbPool.query(query, [assignmentID]);
+            const results = await dbClient.query(query, [assignmentID]);
             if(results.rowCount == 0) throw new Error("Not found");
             response.code = 200;
             response.body.message = results;
@@ -28,12 +28,13 @@ const manageAssignmentsModel = {
             response.body.message = error.message;
             console.log("[ERROR in manageAssignmentsModel.update]: ", error);
         } finally {
+            dbClient.release();
             return response;
         }
     },
 
     create: async(userID, title, description, startDate, endDate) => {
-        await dbPool.connect();
+        const dbClient = await dbPool.connect();
 
         const query = `
         INSERT INTO assignments
@@ -42,7 +43,7 @@ const manageAssignmentsModel = {
         `;
 
         try {
-            const results = await dbPool.query(query, [userID, title, description, startDate, endDate]);
+            const results = await dbClient.query(query, [userID, title, description, startDate, endDate]);
             if(results.rowCount == 0) throw new Error("Creation failed");
             response.code = 201;
             response.body.message = results;
@@ -51,13 +52,14 @@ const manageAssignmentsModel = {
             response.body.message = error.message;
             console.log("[ERROR in manageAssignmentsModel.create]: ", error);
         } finally {
+            dbClient.release();
             return response;
         }
 
     },
 
     update: async(assignmentID, title, description, startDate, endDate) => {
-        await dbPool.connect();
+        const dbClient = await dbPool.connect();
         
         const query = `
         UPDATE assignments
@@ -66,7 +68,7 @@ const manageAssignmentsModel = {
         `;
 
         try {
-            const results = await dbPool.query(query, [title, description, startDate, endDate, assignmentID]);
+            const results = await dbClient.query(query, [title, description, startDate, endDate, assignmentID]);
             if(results.rowCount == 0) throw new Error("Updation failed");
             response.code = 200;
             response.body.message = results;
@@ -74,12 +76,13 @@ const manageAssignmentsModel = {
             response.body.message = error.message;
             console.log("[ERROR in manageAssignmentsModel.update]: ", error);
         } finally {
+            dbClient.release();
             return response;
         }
     },
 
     delete: async(assignmentID) => {
-        await dbPool.connect();
+        const dbClient = await dbPool.connect();
 
         const query = `
         DELETE FROM assignments
@@ -87,19 +90,20 @@ const manageAssignmentsModel = {
         `;
 
         try {
-            const results = await dbPool.query(query, [assignmentID]);
+            const results = await dbClient.query(query, [assignmentID]);
             response.code = 410;
             response.body.message = results;
         } catch (error) {
             response.body.message = error.message;
             console.log("[ERROR in manageAssignmentsModel.update]: ", error);
         } finally {
+            dbClient.release();
             return response;
         }
     },
 
     filter: async(title, difficulty, status, startDate, endDate) => {
-        await dbPool.connect();
+        const dbClient = await dbPool.connect();
 
         try{
             const conditions = [];
@@ -108,7 +112,6 @@ const manageAssignmentsModel = {
 
             let query = "SELECT * FROM assignments";
 
-            // Dynamically add filters
             if (title !== undefined) {
                 conditions.push(`title = $${paramIndex++}`);
                 params.push(title);
@@ -136,7 +139,7 @@ const manageAssignmentsModel = {
                 query += " WHERE " + conditions.join(" AND ");
             }
 
-            const results = await dbPool.query(query, params);
+            const results = await dbClient.query(query, params);
 
             response.code = 200;
             response.body.message = results;
@@ -144,6 +147,44 @@ const manageAssignmentsModel = {
             response.body.message = error.message;
             console.log("[ERROR in manageAssignmentsModel.update]: ", error);
         } finally {
+            dbClient.release();
+            return response;
+        }
+    },
+
+    view: async (userID, type) => {
+        const dbClient = await dbPool.connect();
+        
+        try{
+            var query = "";
+            if(type === "participant"){
+                query = `
+                        SELECT * 
+                        FROM assignmentsinfo ai
+                        INNER JOIN users u
+                        ON ai.userid = u.userid
+                        INNER JOIN assignments a
+                        ON ai.assignmentid = a.assignmentid
+                        WHERE u.userid = $1;
+                        `;
+            }else if(type === "owner"){
+                query = `
+                        SELECT *
+                        FROM assignments a
+                        INNER JOIN users u
+                        on a.userid = u.userid
+                        WHERE u.userid = $1;
+                        `;
+            }
+
+            const results = await dbClient.query(query, [userID]);
+            response.code = 200;
+            response.body.message = results;
+        } catch (error) {
+            response.body.message = error.message;
+            console.log("[ERROR in manageAssignmentsModel.update]: ", error);
+        } finally {
+            dbClient.release();
             return response;
         }
     }

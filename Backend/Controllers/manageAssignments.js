@@ -44,6 +44,19 @@ const manageAssignmentsController = {
         const response = await manageAssignmentsModel.filter(title, difficulty, status, startDate, endDate);
         res.status(response.code)
             .json(response.body.message);
+    },
+    
+    view: async (req, res) => {
+        const userID = req.query.userID; // Get from query params
+        const type = req.query.type;
+
+        if (!userID) {
+            return res.status(400).json("UserID is required");
+        }
+
+        const response = await manageAssignmentsModel.view(userID, type);
+        res.status(response.code)
+            .json(response.body.message);
     }
 }
 

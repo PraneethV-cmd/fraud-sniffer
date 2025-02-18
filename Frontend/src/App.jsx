@@ -1,16 +1,13 @@
-import './App.css'
-import ColorTabs from './components/tabs'
-import TemporaryDrawer from './components/sidebar'
+import { Routes, Route } from "react-router-dom";
+
+import Home from "./pages/home/home";
 
 function App() {
 
   return (
-    <>
-      <div>
-        <TemporaryDrawer></TemporaryDrawer>
-        <ColorTabs></ColorTabs>
-      </div>
-    </>
+    <Routes>
+      <Route path="/" element={<Home />} />
+    </Routes>
   )
 }
 

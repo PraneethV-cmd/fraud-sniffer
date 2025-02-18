@@ -1,28 +1,160 @@
-import * as React from 'react';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import Box from '@mui/material/Box';
+import React, { useEffect, useState } from "react";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Typography from "@mui/material/Typography";
+import CircularProgress from "@mui/material/CircularProgress"; // Loader
 
 export default function ColorTabs() {
-  const [value, setValue] = React.useState('one');
+  const [value, setValue] = useState("View Assignments");
+  const [assignmentList, setAssignmentList] = useState([]);
+  const [managableAssignments, setManagableAssignments] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const userID = sessionStorage.getItem("userID");
+    setLoading(true);
+
+    Promise.all([
+      fetch(`http://localhost:8080/api/assignment/view?userID=${userID}&type=participant`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      }).then((response) => response.json()),
+
+      fetch(`http://localhost:8080/api/assignment/view?userID=${userID}&type=owner`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      }).then((response) => response.json()),
+    ])
+      .then(([participantData, ownerData]) => {
+        console.log("Participant:", participantData);
+        console.log("Owner:", ownerData);
+        setAssignmentList(participantData.rows);
+        setManagableAssignments(ownerData.rows);
+      })
+      .catch((err) => {
+        console.error("Error fetching assignments:", err);
+      })
+      .finally(() => {
+        setLoading(false); // Stop loading AFTER fetch completes
+      });
+  }, []);
+
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
   return (
-    <Box sx={{ width: '100%' }}>
+    <Box sx={{ width: "100%", padding: "20px" }}>
       <Tabs
         value={value}
         onChange={handleChange}
         textColor="secondary"
         indicatorColor="secondary"
-        aria-label="secondary tabs example"
       >
-        <Tab value="one" label="Item One" />
-        <Tab value="two" label="Item Two" />
-        <Tab value="three" label="Item Three" />
+        <Tab value="View Assignments" label="📚 View Assignments" />
+        <Tab value="Manage Assignments" label="📔 Manage Assignments" />
+        <Tab value="Create Assignments" label="✍️ Create Assignments" />
+        <Tab value="Check Plagiarism" label="🔍 Check Plagiarism" />
       </Tabs>
+
+      {value === "View Assignments" && (
+        <Box sx={{ marginTop: 2, width: "100%" }}>
+          {loading ? (
+            <Box display="flex" justifyContent="center" mt={4}>
+              <CircularProgress color="primary" />
+            </Box>
+          ) : assignmentList.length > 0 ? (
+            assignmentList.map((assignment) => (
+              <Card
+                key={assignment.assignmentsinfoid}
+                sx={{
+                  marginBottom: 2,
+                  padding: 2,
+                  width: "100%",
+                  backgroundColor: "#f9f9f9",
+                  boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.1)",
+                }}
+              >
+                <CardContent>
+                  <Typography variant="h6" sx={{ fontWeight: "bold", color: "#1976D2" }}>
+                    {assignment.title}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary" mt={1}>
+                    {assignment.description}
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontStyle: "italic", marginTop: "8px" }}>
+                    Difficulty: {assignment.difficulty} | Status: {assignment.status}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    Start Date: {new Date(assignment.startdate).toLocaleString()}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    End Date: {new Date(assignment.enddate).toLocaleString()}
+                  </Typography>
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            <Typography variant="h6" textAlign="center" mt={4}>
+              No assignments found.
+            </Typography>
+          )}
+        </Box>
+      )}
+
+
+      {value === "Manage Assignments" && (
+        <Box sx={{ marginTop: 2, width: "100%" }}>
+          {loading ? (
+            <Box display="flex" justifyContent="center" mt={4}>
+              <CircularProgress color="primary" />
+            </Box>
+          ) : managableAssignments.length > 0 ? (
+            managableAssignments.map((assignment) => (
+              <Card
+                key={assignment.assignmentsinfoid}
+                sx={{
+                  marginBottom: 2,
+                  padding: 2,
+                  width: "100%",
+                  backgroundColor: "#f9f9f9",
+                  boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.1)",
+                }}
+              >
+                <CardContent>
+                  <Typography variant="h6" sx={{ fontWeight: "bold", color: "#1976D2" }}>
+                    {assignment.title}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary" mt={1}>
+                    {assignment.description}
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontStyle: "italic", marginTop: "8px" }}>
+                    Difficulty: {assignment.difficulty} | Status: {assignment.status}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    Start Date: {new Date(assignment.startdate).toLocaleString()}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    End Date: {new Date(assignment.enddate).toLocaleString()}
+                  </Typography>
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            <Typography variant="h6" textAlign="center" mt={4}>
+              No assignments found.
+            </Typography>
+          )}
+        </Box>
+      )}
+
+      
+      {value === "Create Assignments" && <div>Create New Assignment</div>}
+      {value === "Check Plagiarism" && <div>Plagiarism Checker</div>}
     </Box>
   );
 }
