@@ -10,12 +10,12 @@ app.use(express.urlencoded({ extended: true }));
 
 const mainRouter = require("./mainRouter");
 
-const { initSchema } = require("./Database/initSchema");
+const { initDB } = require("./Database/initDB");
 
 (async () => {
     try {
         console.log("[LOG]: Initializing the database schema.");
-        await initSchema();
+        await initDB();
     } catch (err) {
       console.error("[ERROR in App]: ", err);
     }

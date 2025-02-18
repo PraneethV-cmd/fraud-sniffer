@@ -1,3 +1,4 @@
+const { stat } = require("fs");
 const dbPool = require("../Database/createPool");
 
 const response = {
@@ -88,6 +89,56 @@ const manageAssignmentsModel = {
         try {
             const results = await dbPool.query(query, [assignmentID]);
             response.code = 410;
+            response.body.message = results;
+        } catch (error) {
+            response.body.message = error.message;
+            console.log("[ERROR in manageAssignmentsModel.update]: ", error);
+        } finally {
+            return response;
+        }
+    },
+
+    filter: async(title, difficulty, status, startDate, endDate) => {
+        await dbPool.connect();
+
+        try{
+            const conditions = [];
+            const params = [];
+            let paramIndex = 1;
+
+            let query = "SELECT * FROM assignments";
+
+            // Dynamically add filters
+            if (title !== undefined) {
+                conditions.push(`title = $${paramIndex++}`);
+                params.push(title);
+            }
+            if (difficulty !== undefined) {
+                conditions.push(`difficulty = $${paramIndex++}`);
+                params.push(difficulty);
+            }
+            if (status !== undefined) {
+                conditions.push(`status = $${paramIndex++}`);
+                params.push(status);
+            }
+
+            if(startDate !== undefined){
+                conditions.push(`startdate >= $${paramIndex++}`);
+                params.push(startDate);
+            }
+
+            if(endDate !== undefined){
+                conditions.push(`enddate <= $${paramIndex++}`);
+                params.push(endDate);
+            }
+
+            if (conditions.length > 0) {
+                query += " WHERE " + conditions.join(" AND ");
+            }
+
+            const results = await dbPool.query(query, params);
+
+            response.code = 200;
             response.body.message = results;
         } catch (error) {
             response.body.message = error.message;

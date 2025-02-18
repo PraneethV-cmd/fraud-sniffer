@@ -3,11 +3,11 @@ const fs = require('fs');
 
 const poolConnection = require("./createPool");
 
-const initSchema = async () => {
+const initDB = async () => {
     try {
         await poolConnection.connect();
         // Read the schema.sql file
-        const schema = await fs.promises.readFile("./database/schema.sql", "utf8");
+        const schema = await fs.promises.readFile("./database/Schema/schema.sql", "utf8");
         await poolConnection.query(schema);
 
         console.log("[LOG]: Schema Initialized Successfully");
@@ -18,5 +18,5 @@ const initSchema = async () => {
 
 
 module.exports = {
-    initSchema
+    initDB
 }

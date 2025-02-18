@@ -32,6 +32,18 @@ const manageAssignmentsController = {
         const response = await manageAssignmentsModel.delete(assignmentID);
         res.status(response.code)
             .json(response.body.message);
+    },
+
+    filter: async(req, res) => {
+        const title = req.query.title;
+        const difficulty = req.query.difficulty;
+        const status = req.query.status;
+        const startDate = req.query.startDate;
+        const endDate = req.query.endDate;
+
+        const response = await manageAssignmentsModel.filter(title, difficulty, status, startDate, endDate);
+        res.status(response.code)
+            .json(response.body.message);
     }
 }
 
