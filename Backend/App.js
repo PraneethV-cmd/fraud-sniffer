@@ -10,6 +10,17 @@ app.use(express.urlencoded({ extended: true }));
 
 const mainRouter = require("./mainRouter");
 
+const { initSchema } = require("./Database/initSchema");
+
+(async () => {
+    try {
+        console.log("[LOG]: Initializing the database schema.");
+        await initSchema();
+    } catch (err) {
+      console.error("[ERROR in App]: ", err);
+    }
+})();
+
 app.use("/api", mainRouter);
 
 //Test Router
