@@ -5,7 +5,7 @@ const manageAssignmentsController = {
         const assignmentID = req.params.assignmentID;
         const response = await manageAssignmentsModel.get(assignmentID);
         res.status(response.code)
-            .json(response.body);
+            .json(response.body.message);
     },
 
     create: async(req, res) => {
@@ -14,7 +14,7 @@ const manageAssignmentsController = {
 
         const response = await manageAssignmentsModel.create(userID, title, description, startDate, endDate);
         res.status(response.code)
-            .json(response.body);
+            .json(response.body.message);
     },
 
     update: async(req, res) => {
@@ -23,7 +23,7 @@ const manageAssignmentsController = {
 
         const response = await manageAssignmentsModel.update(assignmentID, title, description, startDate, endDate);
         res.status(response.code)
-            .json(response.body);
+            .json(response.body.message);
     },
 
     delete: async(req, res) =>{
@@ -31,7 +31,7 @@ const manageAssignmentsController = {
 
         const response = await manageAssignmentsModel.delete(assignmentID);
         res.status(response.code)
-            .json(response.body);
+            .json(response.body.message);
     }
 }
 

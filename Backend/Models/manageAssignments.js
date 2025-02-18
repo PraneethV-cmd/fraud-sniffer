@@ -3,8 +3,7 @@ const dbPool = require("../Database/createPool");
 const response = {
     code: 503,
     body: {
-        error: "Service Unavailable",
-        msg: ""
+        message: ""
     }
 }
 
@@ -20,10 +19,12 @@ const manageAssignmentsModel = {
 
         try {
             const results = await dbPool.query(query, [assignmentID]);
-            response.code = 202;
-            response.body.msg = results;
+            if(results.rowCount == 0) throw new Error("Not found");
+            response.code = 200;
+            response.body.message = results;
         } catch (error) {
-            response.body.error = error;
+            if(error == "Not found") response.code = 404;
+            response.body.message = error.message;
             console.log("[ERROR in manageAssignmentsModel.update]: ", error);
         } finally {
             return response;
@@ -41,11 +42,12 @@ const manageAssignmentsModel = {
 
         try {
             const results = await dbPool.query(query, [userID, title, description, startDate, endDate]);
-            response.code = 202;
-            response.body.msg = results;
+            if(results.rowCount == 0) throw new Error("Creation failed");
+            response.code = 201;
+            response.body.message = results;
 
         } catch (error) {
-            response.body.error = error;
+            response.body.message = error.message;
             console.log("[ERROR in manageAssignmentsModel.create]: ", error);
         } finally {
             return response;
@@ -64,10 +66,11 @@ const manageAssignmentsModel = {
 
         try {
             const results = await dbPool.query(query, [title, description, startDate, endDate, assignmentID]);
-            response.code = 202;
-            response.body.msg = results;
+            if(results.rowCount == 0) throw new Error("Updation failed");
+            response.code = 200;
+            response.body.message = results;
         } catch (error) {
-            response.body.error = error;
+            response.body.message = error.message;
             console.log("[ERROR in manageAssignmentsModel.update]: ", error);
         } finally {
             return response;
@@ -84,10 +87,10 @@ const manageAssignmentsModel = {
 
         try {
             const results = await dbPool.query(query, [assignmentID]);
-            response.code = 202;
-            response.body.msg = results;
+            response.code = 410;
+            response.body.message = results;
         } catch (error) {
-            response.body.error = error;
+            response.body.message = error.message;
             console.log("[ERROR in manageAssignmentsModel.update]: ", error);
         } finally {
             return response;
