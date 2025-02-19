@@ -5,7 +5,8 @@ import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
-import CircularProgress from "@mui/material/CircularProgress"; // Loader
+import CircularProgress from "@mui/material/CircularProgress";
+import CreateAssignmentForm from "./CreateAssignmentForm"; // Import the new component
 
 export default function ColorTabs() {
   const [value, setValue] = useState("View Assignments");
@@ -38,27 +39,48 @@ export default function ColorTabs() {
         console.error("Error fetching assignments:", err);
       })
       .finally(() => {
-        setLoading(false); // Stop loading AFTER fetch completes
+        setLoading(false);
       });
   }, []);
-
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
   return (
-    <Box sx={{ width: "100%", padding: "20px" }}>
+    <Box sx={{ width: "100%", padding: "20px", paddingLeft: "40px" }}>
       <Tabs
         value={value}
         onChange={handleChange}
         textColor="secondary"
         indicatorColor="secondary"
+        sx={{
+          display: "flex",
+          justifyContent: "flex-start",
+          borderBottom: 1,
+          borderColor: "divider",
+        }}
       >
-        <Tab value="View Assignments" label="📚 View Assignments" />
-        <Tab value="Manage Assignments" label="📔 Manage Assignments" />
-        <Tab value="Create Assignments" label="✍️ Create Assignments" />
-        <Tab value="Check Plagiarism" label="🔍 Check Plagiarism" />
+        <Tab
+          value="View Assignments"
+          label="📚 View Assignments"
+          sx={{ fontWeight: "bold", color: "#1976D2", textTransform: "none" }}
+        />
+        <Tab
+          value="Manage Assignments"
+          label="📔 Manage Assignments"
+          sx={{ fontWeight: "bold", color: "#1976D2", textTransform: "none" }}
+        />
+        <Tab
+          value="Create Assignments"
+          label="✍️ Create Assignments"
+          sx={{ fontWeight: "bold", color: "#1976D2", textTransform: "none" }}
+        />
+        <Tab
+          value="Check Plagiarism"
+          label="🔍 Check Plagiarism"
+          sx={{ fontWeight: "bold", color: "#1976D2", textTransform: "none" }}
+        />
       </Tabs>
 
       {value === "View Assignments" && (
@@ -106,7 +128,6 @@ export default function ColorTabs() {
         </Box>
       )}
 
-
       {value === "Manage Assignments" && (
         <Box sx={{ marginTop: 2, width: "100%" }}>
           {loading ? (
@@ -152,8 +173,7 @@ export default function ColorTabs() {
         </Box>
       )}
 
-      
-      {value === "Create Assignments" && <div>Create New Assignment</div>}
+      {value === "Create Assignments" && <CreateAssignmentForm />}
       {value === "Check Plagiarism" && <div>Plagiarism Checker</div>}
     </Box>
   );
