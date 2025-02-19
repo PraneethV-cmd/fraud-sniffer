@@ -19,9 +19,9 @@ const manageAssignmentsController = {
 
     update: async(req, res) => {
         const assignmentID = req.params.assignmentID;
-        const { startDate, endDate, title, description } = req.body;
+        const { endDate, title, description } = req.body;
 
-        const response = await manageAssignmentsModel.update(assignmentID, title, description, startDate, endDate);
+        const response = await manageAssignmentsModel.update(assignmentID, title, description, endDate);
         res.status(response.code)
             .json(response.body.message);
     },
