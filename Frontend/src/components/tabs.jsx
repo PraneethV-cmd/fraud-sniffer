@@ -5,7 +5,11 @@ import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
-import CircularProgress from "@mui/material/CircularProgress"; // Loader
+import CircularProgress from "@mui/material/CircularProgress";
+import IconButton from "@mui/material/IconButton";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AccordionUsage from "./accordion";
 
 export default function ColorTabs() {
   const [value, setValue] = useState("View Assignments");
@@ -47,6 +51,16 @@ export default function ColorTabs() {
     setValue(newValue);
   };
 
+  const handleEdit = (assignmentID) => {
+    alert(`Edit assignment ${assignmentID}`);
+    // TODO: Implement edit functionality
+  };
+
+  const handleDelete = (assignmentID) => {
+    alert(`Delete assignment ${assignmentID}`);
+    // TODO: Implement delete functionality
+  };
+
   return (
     <Box sx={{ width: "100%", padding: "20px" }}>
       <Tabs
@@ -70,7 +84,7 @@ export default function ColorTabs() {
           ) : assignmentList.length > 0 ? (
             assignmentList.map((assignment) => (
               <Card
-                key={assignment.assignmentsinfoid}
+                key={`assignments-${assignment.assignmentinfoid}`}
                 sx={{
                   marginBottom: 2,
                   padding: 2,
@@ -116,7 +130,7 @@ export default function ColorTabs() {
           ) : managableAssignments.length > 0 ? (
             managableAssignments.map((assignment) => (
               <Card
-                key={assignment.assignmentsinfoid}
+                key={`manage_assignments-${assignment.assignmentid}`}
                 sx={{
                   marginBottom: 2,
                   padding: 2,
@@ -125,23 +139,37 @@ export default function ColorTabs() {
                   boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.1)",
                 }}
               >
-                <CardContent>
-                  <Typography variant="h6" sx={{ fontWeight: "bold", color: "#1976D2" }}>
-                    {assignment.title}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary" mt={1}>
-                    {assignment.description}
-                  </Typography>
-                  <Typography variant="body2" sx={{ fontStyle: "italic", marginTop: "8px" }}>
-                    Difficulty: {assignment.difficulty} | Status: {assignment.status}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    Start Date: {new Date(assignment.startdate).toLocaleString()}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    End Date: {new Date(assignment.enddate).toLocaleString()}
-                  </Typography>
-                </CardContent>
+                {/* Flexbox container to align content and buttons */}
+                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  {/* Card Content (Left Side) */}
+                  <CardContent sx={{ flex: 1 }}>
+                    <Typography variant="h6" sx={{ fontWeight: "bold", color: "#1976D2" }}>
+                      {assignment.title}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary" mt={1}>
+                      {assignment.description}
+                    </Typography>
+                    <Typography variant="body2" sx={{ fontStyle: "italic", marginTop: "8px" }}>
+                      Difficulty: {assignment.difficulty} | Status: {assignment.status}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary">
+                      Start Date: {new Date(assignment.startdate).toLocaleString()}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary">
+                      End Date: {new Date(assignment.enddate).toLocaleString()}
+                    </Typography>
+                  </CardContent>
+
+                  {/* Edit & Delete Buttons (Right Side) */}
+                  <Box sx={{ display: "flex", gap: 1, paddingRight: 2 }}>
+                    <IconButton color="primary" onClick={() => handleEdit(assignment.assignmentid)}>
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton color="error" onClick={() => handleDelete(assignment.assignmentid)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
+                </Box>
               </Card>
             ))
           ) : (
@@ -154,7 +182,58 @@ export default function ColorTabs() {
 
       
       {value === "Create Assignments" && <div>Create New Assignment</div>}
-      {value === "Check Plagiarism" && <div>Plagiarism Checker</div>}
+      {value === "Check Plagiarism" && (
+        <Box sx={{ marginTop: 2, width: "100%" }}>
+          {loading ? (
+            <Box display="flex" justifyContent="center" mt={4}>
+              <CircularProgress color="primary" />
+            </Box>
+          ) : managableAssignments.length > 0 ? (
+            managableAssignments.map((assignment) => (
+              <Card
+                key={`plagiarism-${assignment.assignmentid}`}
+                sx={{
+                  marginBottom: 2,
+                  padding: 2,
+                  width: "100%",
+                  backgroundColor: "#f9f9f9",
+                  boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.1)",
+                }}
+                className="card-container"
+              >
+                <div className="card-content">
+                  <CardContent>
+                    <Typography variant="h6" sx={{ fontWeight: "bold", color: "#1976D2" }}>
+                      {assignment.title}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary" mt={1}>
+                      {assignment.description}
+                    </Typography>
+                    <Typography variant="body2" sx={{ fontStyle: "italic", marginTop: "8px" }}>
+                      Difficulty: {assignment.difficulty} | Status: {assignment.status}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary">
+                      Start Date: {new Date(assignment.startdate).toLocaleString()}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary">
+                      End Date: {new Date(assignment.enddate).toLocaleString()}
+                    </Typography>
+                  </CardContent>
+                </div>
+                <div className="card-options">
+
+                </div>
+              </Card>
+            ))
+          ) : (
+            <Typography variant="h6" textAlign="center" mt={4}>
+              No assignments found.
+            </Typography>
+          )}
+        </Box>
+      )}
     </Box>
   );
 }
+
+
