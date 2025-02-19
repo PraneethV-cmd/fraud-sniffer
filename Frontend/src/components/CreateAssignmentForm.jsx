@@ -1,25 +1,31 @@
 import React, { useState, useRef } from "react";
-import { Box, Button, TextField, Typography, MenuItem, List, ListItem, ListItemText, IconButton } from "@mui/material";
+import { Box, Button, TextField, Typography, MenuItem, List, ListItem, ListItemText, IconButton, FormControl, FormLabel, Tooltip, Link } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 
-const subjects = ["Math", "Science", "History", "English"]; // Example subjects
+const difficulties = ["Easy", "Medium", "Hard"]; // Difficulty levels
 
 export default function CreateAssignmentForm() {
   const [title, setTitle] = useState("");
-  const [subject, setSubject] = useState("");
-  const [dueDate, setDueDate] = useState("");
   const [description, setDescription] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [dueDate, setDueDate] = useState("");
+  const [difficulty, setDifficulty] = useState("");
   const [files, setFiles] = useState([]);
   const fileInputRef = useRef(null);
 
   const handleSubmit = (event) => {
     event.preventDefault();
     // Handle form submission logic here
-    console.log({ title, subject, dueDate, description, files });
+    console.log({ title, description, startDate, dueDate, difficulty, files });
   };
 
   const handleFileChange = (event) => {
-    setFiles(Array.from(event.target.files));
+    const newFiles = Array.from(event.target.files);
+    setFiles(prevFiles => [...prevFiles, ...newFiles]);
+    // Reset the file input value to ensure it updates correctly
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   const handleFileDelete = (index) => {
@@ -35,7 +41,7 @@ export default function CreateAssignmentForm() {
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 4 }}>
+    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 4, maxHeight: '80vh', overflow: 'auto' }}>
       <Typography variant="h6" gutterBottom>
         Create New Assignment
       </Typography>
@@ -47,38 +53,63 @@ export default function CreateAssignmentForm() {
         sx={{ mb: 2 }}
       />
       <TextField
-        select
-        label="Subject"
+        label="Description"
         fullWidth
-        value={subject}
-        onChange={(e) => setSubject(e.target.value)}
+        multiline
+        rows={4}
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        sx={{ mb: 2 }}
+      />
+      <TextField
+        select
+        label="Difficulty"
+        fullWidth
+        value={difficulty}
+        onChange={(e) => setDifficulty(e.target.value)}
         sx={{ mb: 2 }}
       >
-        {subjects.map((subject) => (
-          <MenuItem key={subject} value={subject}>
-            {subject}
+        {difficulties.map((level) => (
+          <MenuItem key={level} value={level}>
+            {level}
           </MenuItem>
         ))}
       </TextField>
+      <FormControl fullWidth sx={{ mb: 2 }}>
+        <FormLabel>Assignment Files</FormLabel>
+        <TextField
+          type="file"
+          inputProps={{ multiple: true }}
+          onChange={handleFileChange}
+          inputRef={fileInputRef}
+        />
+      </FormControl>
+      <Box sx={{ maxHeight: '200px', overflow: 'auto', mb: 2 }}>
+        <List>
+          {files.map((file, index) => (
+            <ListItem key={index} secondaryAction={
+              <IconButton edge="end" aria-label="delete" onClick={() => handleFileDelete(index)}>
+                <DeleteIcon />
+              </IconButton>
+            }>
+              <Tooltip title={URL.createObjectURL(file)} arrow>
+                <Link href={URL.createObjectURL(file)} target="_blank" rel="noopener noreferrer">
+                  <ListItemText primary={file.name} />
+                </Link>
+              </Tooltip>
+            </ListItem>
+          ))}
+        </List>
+      </Box>
       <TextField
-        type="file"
+        label="Start Date"
+        type="date"
         fullWidth
-        inputProps={{ multiple: true }}
-        onChange={handleFileChange}
-        inputRef={fileInputRef}
+        InputLabelProps={{ shrink: true }}
+        value={startDate}
+        onChange={(e) => setStartDate(e.target.value)}
         sx={{ mb: 2 }}
       />
-      <List>
-        {files.map((file, index) => (
-          <ListItem key={index} secondaryAction={
-            <IconButton edge="end" aria-label="delete" onClick={() => handleFileDelete(index)}>
-              <DeleteIcon />
-            </IconButton>
-          }>
-            <ListItemText primary={file.name} />
-          </ListItem>
-        ))}
-      </List>
       <TextField
         label="Due Date"
         type="date"
@@ -86,15 +117,6 @@ export default function CreateAssignmentForm() {
         InputLabelProps={{ shrink: true }}
         value={dueDate}
         onChange={(e) => setDueDate(e.target.value)}
-        sx={{ mb: 2 }}
-      />
-      <TextField
-        label="Description"
-        fullWidth
-        multiline
-        rows={4}
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
         sx={{ mb: 2 }}
       />
       <Button type="submit" variant="contained" color="primary">
