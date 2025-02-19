@@ -42,10 +42,9 @@ export default function ColorTabs() {
         console.error("Error fetching assignments:", err);
       })
       .finally(() => {
-        setLoading(false); // Stop loading AFTER fetch completes
+        setLoading(false);
       });
   }, []);
-
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -62,17 +61,39 @@ export default function ColorTabs() {
   };
 
   return (
-    <Box sx={{ width: "100%", padding: "20px" }}>
+    <Box sx={{ width: "100%", padding: "20px", paddingLeft: "40px" }}>
       <Tabs
         value={value}
         onChange={handleChange}
         textColor="secondary"
         indicatorColor="secondary"
+        sx={{
+          display: "flex",
+          justifyContent: "flex-start",
+          borderBottom: 1,
+          borderColor: "divider",
+        }}
       >
-        <Tab value="View Assignments" label="📚 View Assignments" />
-        <Tab value="Manage Assignments" label="📔 Manage Assignments" />
-        <Tab value="Create Assignments" label="✍️ Create Assignments" />
-        <Tab value="Check Plagiarism" label="🔍 Check Plagiarism" />
+        <Tab
+          value="View Assignments"
+          label="📚 View Assignments"
+          sx={{ fontWeight: "bold", color: "#1976D2", textTransform: "none" }}
+        />
+        <Tab
+          value="Manage Assignments"
+          label="📔 Manage Assignments"
+          sx={{ fontWeight: "bold", color: "#1976D2", textTransform: "none" }}
+        />
+        <Tab
+          value="Create Assignments"
+          label="✍️ Create Assignments"
+          sx={{ fontWeight: "bold", color: "#1976D2", textTransform: "none" }}
+        />
+        <Tab
+          value="Check Plagiarism"
+          label="🔍 Check Plagiarism"
+          sx={{ fontWeight: "bold", color: "#1976D2", textTransform: "none" }}
+        />
       </Tabs>
 
       {value === "View Assignments" && (
@@ -119,7 +140,6 @@ export default function ColorTabs() {
           )}
         </Box>
       )}
-
 
       {value === "Manage Assignments" && (
         <Box sx={{ marginTop: 2, width: "100%" }}>
@@ -182,58 +202,7 @@ export default function ColorTabs() {
 
       
       {value === "Create Assignments" && <div>Create New Assignment</div>}
-      {value === "Check Plagiarism" && (
-        <Box sx={{ marginTop: 2, width: "100%" }}>
-          {loading ? (
-            <Box display="flex" justifyContent="center" mt={4}>
-              <CircularProgress color="primary" />
-            </Box>
-          ) : managableAssignments.length > 0 ? (
-            managableAssignments.map((assignment) => (
-              <Card
-                key={`plagiarism-${assignment.assignmentid}`}
-                sx={{
-                  marginBottom: 2,
-                  padding: 2,
-                  width: "100%",
-                  backgroundColor: "#f9f9f9",
-                  boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.1)",
-                }}
-                className="card-container"
-              >
-                <div className="card-content">
-                  <CardContent>
-                    <Typography variant="h6" sx={{ fontWeight: "bold", color: "#1976D2" }}>
-                      {assignment.title}
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary" mt={1}>
-                      {assignment.description}
-                    </Typography>
-                    <Typography variant="body2" sx={{ fontStyle: "italic", marginTop: "8px" }}>
-                      Difficulty: {assignment.difficulty} | Status: {assignment.status}
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary">
-                      Start Date: {new Date(assignment.startdate).toLocaleString()}
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary">
-                      End Date: {new Date(assignment.enddate).toLocaleString()}
-                    </Typography>
-                  </CardContent>
-                </div>
-                <div className="card-options">
-
-                </div>
-              </Card>
-            ))
-          ) : (
-            <Typography variant="h6" textAlign="center" mt={4}>
-              No assignments found.
-            </Typography>
-          )}
-        </Box>
-      )}
+      {value === "Check Plagiarism" && <div>Plagiarism Checker</div>}
     </Box>
   );
 }
-
-
