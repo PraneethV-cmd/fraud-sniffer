@@ -8,8 +8,8 @@ const AssignmentForm = () => {
     e.preventDefault();
     
     // Send to backend (Replace with actual API)
-    await fetch("/api/assignments", {
-      method: "POST",
+    await fetch("/api/assignment", {
+      method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title, description }),
     });
