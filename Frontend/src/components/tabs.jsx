@@ -10,6 +10,7 @@ import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AccordionUsage from "./accordion";
+import CreateAssignmentForm from "./CreateAssignmentForm";  
 
 export default function ColorTabs() {
   const [value, setValue] = useState("View Assignments");
@@ -201,7 +202,7 @@ export default function ColorTabs() {
       )}
 
       
-      {value === "Create Assignments" && <div>Create New Assignment</div>}
+      {value === "Create Assignments" && <CreateAssignmentForm />}
       {value === "Check Plagiarism" && <div>Plagiarism Checker</div>}
     </Box>
   );
