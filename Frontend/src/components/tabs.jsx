@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import CreateAssignmentForm from "./CreateAssignmentForm";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
@@ -201,7 +202,7 @@ export default function ColorTabs() {
       )}
 
       
-      {value === "Create Assignments" && <div>Create New Assignment</div>}
+      {value === "Create Assignments" && <CreateAssignmentForm />}
       {value === "Check Plagiarism" && <div>Plagiarism Checker</div>}
     </Box>
   );
