@@ -30,3 +30,16 @@
     font-size: 24px;
     color: #2BC0E4;
 }
+.create-assignment-page {
+    overflow: hidden;
+}
+
+.create-assignment-page {
+    overflow: -moz-scrollbars-none;
+    -ms-overflow-style: none;
+    scrollbar-width: none; /* Firefox */
+}
+
+.create-assignment-page::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
+}

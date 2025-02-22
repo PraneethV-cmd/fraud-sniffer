@@ -1,7 +1,8 @@
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS assignments CASCADE;
 DROP TABLE IF EXISTS assignmentsinfo CASCADE;
-DROP TABLE IF EXIsTS submissions CASCADE;
+DROP TABLE IF EXISTS submissions CASCADE;
+DROP TABLE IF EXISTS plagiarism_reports CASCADE;
 
 CREATE TABLE users (
   userID SERIAL PRIMARY KEY,
@@ -38,6 +39,14 @@ CREATE TABLE submissions (
   assignmentInfoID INT NOT NULL,
   submissionDate DATE NOT NULL,
   FOREIGN KEY (assignmentInfoID) REFERENCES assignmentsinfo(assignmentInfoID) ON DELETE CASCADE
+);
+
+CREATE TABLE plagiarism_reports (
+    id SERIAL PRIMARY KEY,
+    file1 TEXT NOT NULL,
+    file2 TEXT NOT NULL,
+    similarity TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Insert Users

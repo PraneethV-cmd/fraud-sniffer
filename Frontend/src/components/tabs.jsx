@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 import React, { useEffect, useState } from "react";
 import CreateAssignmentForm from "./CreateAssignmentForm";
+=======
+import React, { useContext, useEffect, useState } from "react";
+>>>>>>> 88336be53f2bcc40226769ad31260e6cd3f7142a
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
@@ -11,12 +15,18 @@ import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AccordionUsage from "./accordion";
+import CreateAssignmentForm from "./CreateAssignmentForm";  
+import AccordionUsage from "./accordionManageAssignments";
+import CreateAssignmentForm from "./CreateAssignmentForm";
+import { Context } from "../context/context";
 
 export default function ColorTabs() {
-  const [value, setValue] = useState("View Assignments");
-  const [assignmentList, setAssignmentList] = useState([]);
-  const [managableAssignments, setManagableAssignments] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const {
+    value, setValue,
+    assignmentList, setAssignmentList,
+    managableAssignments, setManagableAssignments,
+    loading, setLoading
+  } = useContext(Context);
 
   useEffect(() => {
     const userID = sessionStorage.getItem("userID");
@@ -149,50 +159,11 @@ export default function ColorTabs() {
               <CircularProgress color="primary" />
             </Box>
           ) : managableAssignments.length > 0 ? (
-            managableAssignments.map((assignment) => (
-              <Card
-                key={`manage_assignments-${assignment.assignmentid}`}
-                sx={{
-                  marginBottom: 2,
-                  padding: 2,
-                  width: "100%",
-                  backgroundColor: "#f9f9f9",
-                  boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.1)",
-                }}
-              >
-                {/* Flexbox container to align content and buttons */}
-                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  {/* Card Content (Left Side) */}
-                  <CardContent sx={{ flex: 1 }}>
-                    <Typography variant="h6" sx={{ fontWeight: "bold", color: "#1976D2" }}>
-                      {assignment.title}
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary" mt={1}>
-                      {assignment.description}
-                    </Typography>
-                    <Typography variant="body2" sx={{ fontStyle: "italic", marginTop: "8px" }}>
-                      Difficulty: {assignment.difficulty} | Status: {assignment.status}
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary">
-                      Start Date: {new Date(assignment.startdate).toLocaleString()}
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary">
-                      End Date: {new Date(assignment.enddate).toLocaleString()}
-                    </Typography>
-                  </CardContent>
-
-                  {/* Edit & Delete Buttons (Right Side) */}
-                  <Box sx={{ display: "flex", gap: 1, paddingRight: 2 }}>
-                    <IconButton color="primary" onClick={() => handleEdit(assignment.assignmentid)}>
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton color="error" onClick={() => handleDelete(assignment.assignmentid)}>
-                      <DeleteIcon />
-                    </IconButton>
-                  </Box>
-                </Box>
-              </Card>
-            ))
+            <>
+              {managableAssignments.map((assignment) => (
+                <AccordionUsage key={`manage_assignments-${assignment.assignmentid}`} title={assignment.title} description={assignment.description} difficulty={assignment.difficulty} status={assignment.status} startdate={assignment.startdate} enddate={assignment.enddate}/>
+              ))}
+            </>
           ) : (
             <Typography variant="h6" textAlign="center" mt={4}>
               No assignments found.

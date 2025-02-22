@@ -41,7 +41,7 @@ export default function CreateAssignmentForm() {
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 4, maxHeight: '80vh', overflow: 'auto' }}>
+    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 4, maxHeight: '80vh', overflow: 'auto' }} className="create-assignment-page">
       <Typography variant="h6" gutterBottom>
         Create New Assignment
       </Typography>
