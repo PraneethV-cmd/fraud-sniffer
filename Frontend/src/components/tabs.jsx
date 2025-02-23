@@ -1,9 +1,6 @@
-<<<<<<< HEAD
 import React, { useEffect, useState } from "react";
 import CreateAssignmentForm from "./CreateAssignmentForm";
-=======
 import React, { useContext, useEffect, useState } from "react";
->>>>>>> 88336be53f2bcc40226769ad31260e6cd3f7142a
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";

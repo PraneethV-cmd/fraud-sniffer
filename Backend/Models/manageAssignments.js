@@ -1,136 +1,119 @@
 const dbPool = require("../Database/createPool");
 
-const response = {
-    code: 503,
-    body: {
-        message: ""
-    }
-}
-
 const manageAssignmentsModel = {
     get: async (assignmentID) => {
-        const dbClient = await dbPool.connect();
+        const response = { code: 503, body: { message: "" } };
 
-        const query = `
-        SELECT *
-        FROM assignments
-        WHERE assignmentID = $1;
-        `;
+        const query = `SELECT * FROM assignments WHERE assignmentID = $1;`;
 
         try {
-            const results = await dbClient.query(query, [assignmentID]);
-            if(results.rowCount == 0) throw new Error("Not found");
+            const results = await dbPool.query(query, [assignmentID]);
+            if (results.rowCount === 0) throw new Error("Not found");
+
             response.code = 200;
-            response.body.message = results;
+            response.body.message = results.rows;
         } catch (error) {
-            if(error == "Not found") response.code = 404;
+            response.code = error.message === "Not found" ? 404 : 500;
             response.body.message = error.message;
-            console.log("[ERROR in manageAssignmentsModel.update]: ", error);
-        } finally {
-            dbClient.release();
-            return response;
+            console.error("[ERROR in manageAssignmentsModel.get]:", error);
         }
+
+        return response;
     },
 
-    create: async(userID, title, description, startDate, endDate) => {
-        const dbClient = await dbPool.connect();
+    create: async (...params) => {
+        const response = { code: 503, body: { message: "" } };
 
         const query = `
-        INSERT INTO assignments
-        (userID, title, description, startDate, endDate)
-        VALUES ($1, $2, $3, $4, $5);
-        `;
+        INSERT INTO assignments (userID, title, description, startDate, endDate, type, difficulty, filename, originalFilename, filePath, fileType, fileSize, isZip)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+        RETURNING *;`;
 
         try {
-            const results = await dbClient.query(query, [userID, title, description, startDate, endDate]);
-            if(results.rowCount == 0) throw new Error("Creation failed");
+            const results = await dbPool.query(query, params);
             response.code = 201;
-            response.body.message = results;
-
+            response.body.message = results.rows[0];
         } catch (error) {
+            response.code = 500;
             response.body.message = error.message;
-            console.log("[ERROR in manageAssignmentsModel.create]: ", error);
-        } finally {
-            dbClient.release();
-            return response;
+            console.error("[ERROR in manageAssignmentsModel.create]:", error);
         }
 
+        return response;
     },
 
-    update: async(assignmentID, title, description, endDate) => {
-        const dbClient = await dbPool.connect();
-        
+    update: async (assignmentID, title, description, endDate) => {
+        const response = { code: 503, body: { message: "" } };
+
         const query = `
         UPDATE assignments
         SET title = $1, description = $2, endDate = $3
-        WHERE assignmentID = $4;
-        `;
+        WHERE assignmentID = $4
+        RETURNING *;`;
 
         try {
-            const results = await dbClient.query(query, [title, description, endDate, assignmentID]);
-            if(results.rowCount == 0) throw new Error("Updation failed");
+            const results = await dbPool.query(query, [title, description, endDate, assignmentID]);
+            if (results.rowCount === 0) throw new Error("Update failed");
+
             response.code = 200;
-            response.body.message = results;
+            response.body.message = results.rows[0];
         } catch (error) {
+            response.code = 500;
             response.body.message = error.message;
-            console.log("[ERROR in manageAssignmentsModel.update]: ", error);
-        } finally {
-            dbClient.release();
-            return response;
+            console.error("[ERROR in manageAssignmentsModel.update]:", error);
         }
+
+        return response;
     },
 
-    delete: async(assignmentID) => {
-        const dbClient = await dbPool.connect();
+    delete: async (assignmentID) => {
+        const response = { code: 503, body: { message: "" } };
 
-        const query = `
-        DELETE FROM assignments
-        WHERE assignmentID = $1;
-        `;
+        const query = `DELETE FROM assignments WHERE assignmentID = $1 RETURNING *;`;
 
         try {
-            const results = await dbClient.query(query, [assignmentID]);
-            response.code = 410;
-            response.body.message = results;
+            const results = await dbPool.query(query, [assignmentID]);
+            if (results.rowCount === 0) throw new Error("Delete failed");
+
+            response.code = 200;
+            response.body.message = results.rows[0]; // Return deleted assignment data
         } catch (error) {
+            response.code = 500;
             response.body.message = error.message;
-            console.log("[ERROR in manageAssignmentsModel.update]: ", error);
-        } finally {
-            dbClient.release();
-            return response;
+            console.error("[ERROR in manageAssignmentsModel.delete]:", error);
         }
+
+        return response;
     },
 
-    filter: async(title, difficulty, status, startDate, endDate) => {
-        const dbClient = await dbPool.connect();
+    filter: async (title, difficulty, status, startDate, endDate) => {
+        const response = { code: 503, body: { message: "" } };
 
-        try{
+        try {
             const conditions = [];
             const params = [];
             let paramIndex = 1;
 
             let query = "SELECT * FROM assignments";
 
-            if (title !== undefined) {
-                conditions.push(`title = $${paramIndex++}`);
-                params.push(title);
+            if (title) {
+                conditions.push(`LOWER(title) LIKE LOWER($${paramIndex++})`);
+                params.push(`%${title}%`);
             }
-            if (difficulty !== undefined) {
+            if (difficulty) {
                 conditions.push(`difficulty = $${paramIndex++}`);
                 params.push(difficulty);
             }
-            if (status !== undefined) {
+            if (status) {
                 conditions.push(`status = $${paramIndex++}`);
                 params.push(status);
             }
-
-            if(startDate !== undefined){
-                conditions.push(`startdate >= $${paramIndex++}`);
+            if (startDate) {
+                conditions.push(`startDate >= $${paramIndex++}`);
                 params.push(startDate);
             }
-
-            if(endDate !== undefined){
-                conditions.push(`enddate <= $${paramIndex++}`);
+            if (endDate) {
+                conditions.push(`endDate <= $${paramIndex++}`);
                 params.push(endDate);
             }
 
@@ -138,55 +121,53 @@ const manageAssignmentsModel = {
                 query += " WHERE " + conditions.join(" AND ");
             }
 
-            const results = await dbClient.query(query, params);
-
+            const results = await dbPool.query(query, params);
             response.code = 200;
-            response.body.message = results;
+            response.body.message = results.rows;
         } catch (error) {
+            response.code = 500;
             response.body.message = error.message;
-            console.log("[ERROR in manageAssignmentsModel.update]: ", error);
-        } finally {
-            dbClient.release();
-            return response;
+            console.error("[ERROR in manageAssignmentsModel.filter]:", error);
         }
+
+        return response;
     },
 
     view: async (userID, type) => {
-        const dbClient = await dbPool.connect();
-        
-        try{
-            var query = "";
-            if(type === "participant"){
+        const response = { code: 503, body: { message: "" } };
+
+        try {
+            let query = "";
+
+            if (type === "participant") {
                 query = `
-                        SELECT * 
-                        FROM assignmentsinfo ai
-                        INNER JOIN users u
-                        ON ai.userid = u.userid
-                        INNER JOIN assignments a
-                        ON ai.assignmentid = a.assignmentid
-                        WHERE u.userid = $1;
-                        `;
-            }else if(type === "owner"){
+                    SELECT * 
+                    FROM assignmentsinfo ai
+                    INNER JOIN users u ON ai.userID = u.userID
+                    INNER JOIN assignments a ON ai.assignmentID = a.assignmentID
+                    WHERE u.userID = $1;`;
+            } else if (type === "owner") {
                 query = `
-                        SELECT *
-                        FROM assignments a
-                        INNER JOIN users u
-                        on a.userid = u.userid
-                        WHERE u.userid = $1;
-                        `;
+                    SELECT *
+                    FROM assignments a
+                    INNER JOIN users u ON a.userID = u.userID
+                    WHERE u.userID = $1;`;
+            } else {
+                throw new Error("Invalid type provided");
             }
 
-            const results = await dbClient.query(query, [userID]);
+            const results = await dbPool.query(query, [userID]);
             response.code = 200;
-            response.body.message = results;
+            response.body.message = results.rows;
         } catch (error) {
+            response.code = 500;
             response.body.message = error.message;
-            console.log("[ERROR in manageAssignmentsModel.update]: ", error);
-        } finally {
-            dbClient.release();
-            return response;
+            console.error("[ERROR in manageAssignmentsModel.view]:", error);
         }
+
+        return response;
     }
-}
+};
 
 module.exports = manageAssignmentsModel;
+

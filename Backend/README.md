@@ -1,8 +1,6 @@
-================
 
 ## API Endpoints
 
-================
 
 ### CREATE ASSIGNMENT - PUT /assignment
 
