@@ -1,63 +1,201 @@
-const manageAssignmentsModel = require('../Models/manageAssignments');
+const manageAssignmentsModel = require("../Models/manageAssignments");
+const fs = require("fs");
 
 const manageAssignmentsController = {
-    get: async(req, res) => {
-        const assignmentID = req.params.assignmentID;
-        const response = await manageAssignmentsModel.get(assignmentID);
-        res.status(response.code)
-            .json(response.body.message);
-    },
+    get: async (req, res) => {
+        try {
+            const assignmentID = req.params.assignmentID;
+            const response = await manageAssignmentsModel.get(assignmentID);
 
-    create: async(req, res) => {
-        const { userID, title, endDate, description } = req.body;
-        const startDate = new Date();
+            if (!response || !response.body) {
+                return res.status(404).json({ error: "Assignment not found" });
+            }
 
-        const response = await manageAssignmentsModel.create(userID, title, description, startDate, endDate);
-        res.status(response.code)
-            .json(response.body.message);
-    },
-
-    update: async(req, res) => {
-        const assignmentID = req.params.assignmentID;
-        const { endDate, title, description } = req.body;
-
-        const response = await manageAssignmentsModel.update(assignmentID, title, description, endDate);
-        res.status(response.code)
-            .json(response.body.message);
-    },
-
-    delete: async(req, res) =>{
-        const assignmentID = req.params.assignmentID;
-
-        const response = await manageAssignmentsModel.delete(assignmentID);
-        res.status(response.code)
-            .json(response.body.message);
-    },
-
-    filter: async(req, res) => {
-        const title = req.query.title;
-        const difficulty = req.query.difficulty;
-        const status = req.query.status;
-        const startDate = req.query.startDate;
-        const endDate = req.query.endDate;
-
-        const response = await manageAssignmentsModel.filter(title, difficulty, status, startDate, endDate);
-        res.status(response.code)
-            .json(response.body.message);
-    },
-    
-    view: async (req, res) => {
-        const userID = req.query.userID; // Get from query params
-        const type = req.query.type;
-
-        if (!userID) {
-            return res.status(400).json("UserID is required");
+            res.status(response.code).json(response.body.message);
+        } catch (err) {
+            console.error("Error fetching assignment:", err);
+            res.status(500).json({ error: "Server error" });
         }
+    },
 
-        const response = await manageAssignmentsModel.view(userID, type);
-        res.status(response.code)
-            .json(response.body.message);
+    create: async (req, res) => {
+        try {
+            const { userId, title, endDate, description, type, difficulty } = req.body;
+            const startDate = new Date();
+
+            let fileInfo = {};
+            if (req.file) {
+                fileInfo = {
+                    filename: req.file.filename,
+                    originalFilename: req.file.originalname,
+                    filePath: req.file.path,
+                    fileType: req.file.mimetype,
+                    fileSize: req.file.size,
+                    isZip: req.file.originalname.endsWith(".zip"),
+                };
+            }
+
+            const response = await manageAssignmentsModel.create(
+                userId,
+                title,
+                description,
+                startDate,
+                endDate,
+                type,
+                difficulty,
+                fileInfo.filename || null,
+                fileInfo.originalFilename || null,
+                fileInfo.filePath || null,
+                fileInfo.fileType || null,
+                fileInfo.fileSize || null,
+                fileInfo.isZip || false
+            );
+
+            if (!response) {
+                return res.status(500).json({ error: "Assignment creation failed" });
+            }
+
+            res.status(response.code).json(response.body.message);
+        } catch (err) {
+            console.error("Assignment creation error:", err);
+            res.status(500).json({ error: "Server error" });
+        }
+    },
+
+    update: async (req, res) => {
+        try {
+            const assignmentID = req.params.assignmentID;
+            const { endDate, title, description } = req.body;
+
+            const response = await manageAssignmentsModel.update(
+                assignmentID,
+                title,
+                description,
+                endDate
+            );
+
+            if (!response) {
+                return res.status(500).json({ error: "Update failed" });
+            }
+
+            res.status(response.code).json(response.body.message);
+        } catch (err) {
+            console.error("Update error:", err);
+            res.status(500).json({ error: "Server error" });
+        }
+    },
+
+    delete: async (req, res) => {
+        try {
+            const assignmentID = req.params.assignmentID;
+            const response = await manageAssignmentsModel.delete(assignmentID);
+
+            if (!response) {
+                return res.status(500).json({ error: "Delete failed" });
+            }
+
+            res.status(response.code).json(response.body.message);
+        } catch (err) {
+            console.error("Delete error:", err);
+            res.status(500).json({ error: "Server error" });
+        }
+    },
+
+    filter: async (req, res) => {
+        try {
+            const { title, difficulty, status, startDate, endDate } = req.query;
+            const response = await manageAssignmentsModel.filter(
+                title,
+                difficulty,
+                status,
+                startDate,
+                endDate
+            );
+
+            if (!response) {
+                return res.status(500).json({ error: "Filtering failed" });
+            }
+
+            res.status(response.code).json(response.body.message);
+        } catch (err) {
+            console.error("Filtering error:", err);
+            res.status(500).json({ error: "Server error" });
+        }
+    },
+
+    view: async (req, res) => {
+        try {
+            const { userId, type } = req.query;
+            if (!userId) {
+                return res.status(400).json({ error: "UserID is required" });
+            }
+
+            const response = await manageAssignmentsModel.view(userId, type);
+
+            if (!response) {
+                return res.status(500).json({ error: "View failed" });
+            }
+
+            res.status(response.code).json(response.body.message);
+        } catch (err) {
+            console.error("View error:", err);
+            res.status(500).json({ error: "Server error" });
+        }
+    },
+
+    uploadFile: async (req, res) => {
+        try {
+            if (!req.file) {
+                return res.status(400).json({ error: "No file uploaded" });
+            }
+
+            const fileInfo = {
+                filename: req.file.filename,
+                originalFilename: req.file.originalname,
+                filePath: req.file.path,
+                fileType: req.file.mimetype,
+                fileSize: req.file.size,
+                isZip: req.file.originalname.endsWith(".zip"),
+            };
+
+            const response = await manageAssignmentsModel.create(fileInfo);
+
+            if (!response || !response.fileId) {
+                return res.status(500).json({ error: "File upload failed" });
+            }
+
+            res.status(201).json({
+                message: "File uploaded successfully",
+                fileId: response.fileId,
+                ...fileInfo,
+            });
+        } catch (err) {
+            console.error("Upload error:", err);
+            res.status(500).json({ error: "File upload error" });
+        }
+    },
+
+    downloadFile: async (req, res) => {
+        try {
+            const { id } = req.params;
+            console.log("Requested ID:", id);
+            const file = await manageAssignmentsModel.get(id);
+            if (!file) {
+                console.error(`File not found in DB for ID: ${id}`);
+                return res.status(404).json({ error: "File not found" });
+            }
+            console.log("File Retrieved:", file);
+            if (!fs.existsSync(file.filePath)) {
+                console.error(`File missing on server: ${file.filePath}`);
+                return res.status(404).json({ error: "File not found on server" });
+            }
+            res.download(file.filePath, file.originalFilename);
+        } catch (err) {
+            console.error("Download error:", err);
+            res.status(500).json({ error: "Downloading failed" });
+        }
     }
-}
+};
 
 module.exports = manageAssignmentsController;
+

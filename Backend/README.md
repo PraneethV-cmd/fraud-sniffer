@@ -1,8 +1,6 @@
-================
 
 ## API Endpoints
 
-================
 
 ### CREATE ASSIGNMENT - PUT /assignment
 
@@ -32,3 +30,15 @@
 - Query Params:
 - `userID` (string, required): The userID of the user to view assignments for
 - `type` (string, required): The type of assignment to view (e.g. "owner", "participant")
+
+## DO READDDD
+
+Slight modifications have been done to the end point for now, the create assignment is 
+
+ /create 
+
+request is multi form data, where the 
+key for file: assignment and content-type automatic 
+key for other fields, otherfiles, content-type "text/plain", value = JSON 
+
+uploading is working, downloading not working sometimes, no clue 

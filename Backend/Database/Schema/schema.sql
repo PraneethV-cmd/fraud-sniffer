@@ -22,6 +22,13 @@ CREATE TABLE assignments (
   type VARCHAR(255) NOT NULL,
   difficulty VARCHAR(255) NOT NULL,
   status VARCHAR(255) NOT NULL DEFAULT 'ACTIVE',
+  filename TEXT NOT NULL DEFAULT 'no_file',
+  originalFilename TEXT NOT NULL DEFAULT 'no_file',
+  filePath TEXT NOT NULL DEFAULT '',
+  fileType VARCHAR(50) NOT NULL DEFAULT 'unknown',
+  fileSize BIGINT NOT NULL DEFAULT 0,
+  isZip BOOLEAN DEFAULT FALSE,
+  uploadDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (userID) REFERENCES users(userID) ON DELETE CASCADE
 );
 
@@ -57,7 +64,7 @@ INSERT INTO users (userName, password, email, role) VALUES
 ('David', 'password4', 'david@example.com', 'instructor'),
 ('Emma', 'password5', 'emma@example.com', 'student');
 
--- Insert Assignments (Each user creates their own)
+-- Insert Assignments with Default File Information
 INSERT INTO assignments (userID, title, description, startDate, endDate, type, difficulty, status) VALUES
 (1, 'Math Homework', 'Solve 10 algebra problems', '2024-02-01', '2024-02-10', 'Homework', 'Medium', 'ACTIVE'),
 (2, 'Science Project', 'Build a volcano model', '2024-02-05', '2024-02-15', 'Project', 'Hard', 'ACTIVE'),
@@ -86,3 +93,4 @@ INSERT INTO submissions (assignmentInfoID, submissionDate) VALUES
 (5, '2024-02-15'), -- Emma submitted Charlie's assignment
 (6, '2024-02-16'), -- Alice submitted David's assignment
 (7, '2024-02-18'); -- Charlie submitted David's assignment
+
