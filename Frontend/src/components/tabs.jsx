@@ -1,5 +1,3 @@
-import React, { useEffect, useState } from "react";
-import CreateAssignmentForm from "./CreateAssignmentForm";
 import React, { useContext, useEffect, useState } from "react";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
@@ -8,11 +6,6 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
-import IconButton from "@mui/material/IconButton";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import AccordionUsage from "./accordion";
-import CreateAssignmentForm from "./CreateAssignmentForm";  
 import AccordionUsage from "./accordionManageAssignments";
 import CreateAssignmentForm from "./CreateAssignmentForm";
 import { Context } from "../context/context";
@@ -43,8 +36,8 @@ export default function ColorTabs() {
       .then(([participantData, ownerData]) => {
         console.log("Participant:", participantData);
         console.log("Owner:", ownerData);
-        setAssignmentList(participantData.rows);
-        setManagableAssignments(ownerData.rows);
+        setAssignmentList(participantData);
+        setManagableAssignments(ownerData);
       })
       .catch((err) => {
         console.error("Error fetching assignments:", err);
