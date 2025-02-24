@@ -20,7 +20,7 @@ const manageAssignmentsController = {
 
     create: async (req, res) => {
         try {
-            const { userId, title, endDate, description, type, difficulty } = req.body;
+            const { userID, title, endDate, description, type, difficulty } = req.body;
             const startDate = new Date();
 
             let fileInfo = {};
@@ -36,7 +36,7 @@ const manageAssignmentsController = {
             }
 
             const response = await manageAssignmentsModel.create(
-                userId,
+                userID,
                 title,
                 description,
                 startDate,
@@ -125,12 +125,12 @@ const manageAssignmentsController = {
 
     view: async (req, res) => {
         try {
-            const { userId, type } = req.query;
-            if (!userId) {
-                return res.status(400).json({ error: "UserID is required" });
+            const { userID, type } = req.query;
+            if (!userID) {
+                return res.status(400).json({ error: "userID is required" });
             }
 
-            const response = await manageAssignmentsModel.view(userId, type);
+            const response = await manageAssignmentsModel.view(userID, type);
 
             if (!response) {
                 return res.status(500).json({ error: "View failed" });
