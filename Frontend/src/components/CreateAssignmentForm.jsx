@@ -15,6 +15,22 @@ export default function CreateAssignmentForm() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+
+    // Create assignment:
+    // Body : {
+    //   otherFields: {
+    //                 "userID": 2,
+    //                 "title": "Data Structures Assignment",
+    //                 "description": "Solve 5 graph theory problems",
+    //                 "startDate": "2025-02-20",
+    //                 "endDate": "2025-02-28",
+    //                 "type": "Homework",
+    //                 "difficulty": "Hard",
+    //                 "status": "ACTIVE"
+    //               },
+    //   assignment: files;
+    // }
+    
     // Handle form submission logic here
     console.log({ title, description, startDate, dueDate, difficulty, files });
   };

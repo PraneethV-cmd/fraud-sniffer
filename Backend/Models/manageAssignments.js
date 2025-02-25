@@ -1,8 +1,14 @@
 const dbPool = require("../Database/createPool");
 
+const response = {
+    code: 503, 
+    body: { 
+        message: "" 
+    } 
+};
+
 const manageAssignmentsModel = {
     get: async (assignmentID) => {
-        const response = { code: 503, body: { message: "" } };
 
         const query = `SELECT * FROM assignments WHERE assignmentID = $1;`;
 
@@ -22,7 +28,6 @@ const manageAssignmentsModel = {
     },
 
     create: async (...params) => {
-        const response = { code: 503, body: { message: "" } };
 
         const query = `
         INSERT INTO assignments (userID, title, description, startDate, endDate, type, difficulty, filename, originalFilename, filePath, fileType, fileSize, isZip)
@@ -43,7 +48,6 @@ const manageAssignmentsModel = {
     },
 
     update: async (assignmentID, title, description, endDate) => {
-        const response = { code: 503, body: { message: "" } };
 
         const query = `
         UPDATE assignments
@@ -67,7 +71,6 @@ const manageAssignmentsModel = {
     },
 
     delete: async (assignmentID) => {
-        const response = { code: 503, body: { message: "" } };
 
         const query = `DELETE FROM assignments WHERE assignmentID = $1 RETURNING *;`;
 
@@ -87,7 +90,6 @@ const manageAssignmentsModel = {
     },
 
     filter: async (title, difficulty, status, startDate, endDate) => {
-        const response = { code: 503, body: { message: "" } };
 
         try {
             const conditions = [];
@@ -134,7 +136,6 @@ const manageAssignmentsModel = {
     },
 
     view: async (userID, type) => {
-        const response = { code: 503, body: { message: "" } };
 
         try {
             let query = "";

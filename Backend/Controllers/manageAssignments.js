@@ -101,27 +101,29 @@ const manageAssignmentsController = {
         }
     },
 
-    filter: async (req, res) => {
-        try {
-            const { title, difficulty, status, startDate, endDate } = req.query;
-            const response = await manageAssignmentsModel.filter(
-                title,
-                difficulty,
-                status,
-                startDate,
-                endDate
-            );
+    //Not requires as far now.
+    
+    // filter: async (req, res) => {
+    //     try {
+    //         const { title, difficulty, status, startDate, endDate } = req.query;
+    //         const response = await manageAssignmentsModel.filter(
+    //             title,
+    //             difficulty,
+    //             status,
+    //             startDate,
+    //             endDate
+    //         );
 
-            if (!response) {
-                return res.status(500).json({ error: "Filtering failed" });
-            }
+    //         if (!response) {
+    //             return res.status(500).json({ error: "Filtering failed" });
+    //         }
 
-            res.status(response.code).json(response.body.message);
-        } catch (err) {
-            console.error("Filtering error:", err);
-            res.status(500).json({ error: "Server error" });
-        }
-    },
+    //         res.status(response.code).json(response.body.message);
+    //     } catch (err) {
+    //         console.error("Filtering error:", err);
+    //         res.status(500).json({ error: "Server error" });
+    //     }
+    // },
 
     view: async (req, res) => {
         try {

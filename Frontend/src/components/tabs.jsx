@@ -127,19 +127,15 @@ export default function ColorTabs() {
                   </Typography>
 
                   {/* File Download Section */}
-                  {assignment.filepath && assignment.filepath !== "" && assignment.filepath !== "no_file" ? (
+                  {assignment.filepath && assignment.filepath !== "" && assignment.filepath !== "no_file" && (
                       <Typography variant="body2" sx={{ marginTop: "8px" }}>
-                          📄 File: 
+                          📄 Resource : 
                           <a href={`http://localhost:8080/api/download/${assignment.filename}`} 
                             target="_blank" 
                             rel="noopener noreferrer"
                             style={{ color: "#1976D2", fontWeight: "bold", textDecoration: "none" }}>
                               {assignment.originalfilename || "Download File"}
                           </a>
-                      </Typography>
-                  ) : (
-                      <Typography variant="body2" sx={{ marginTop: "8px", fontStyle: "italic" }}>
-                          No file uploaded.
                       </Typography>
                   )}
 
