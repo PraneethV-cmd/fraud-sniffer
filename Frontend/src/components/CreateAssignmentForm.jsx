@@ -56,28 +56,22 @@ export default function CreateAssignmentForm() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (files.length === 0) {
-        alert("Please upload at least one file.");
-        return;
-    }
-
     let fileToUpload;
     if (files.length > 1) {
         fileToUpload = await zipFiles(); // Zip all files
-    } else {
+    } else if(files.length == 1) {
         fileToUpload = files[0]; // Single file upload
     }
 
     // Create FormData object
     const formData = new FormData();
-    formData.append("assignment", fileToUpload); // File
+    if(files.length >= 1) formData.append("assignment", fileToUpload); // File
     formData.append("otherfields", JSON.stringify({
         userID: 2,
         title: title,
         description: description,
         startDate: startDate,
         endDate: dueDate,
-        type: "Homework",
         difficulty: difficulty,
         status: getStatus(startDate, dueDate)
     })); // Convert object to JSON string

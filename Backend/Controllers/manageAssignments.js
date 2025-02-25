@@ -20,7 +20,7 @@ const manageAssignmentsController = {
 
     create: async (req, res) => {
         try {
-            const { userID, title, endDate, description, type, difficulty } = req.body;
+            const { userID, title, endDate, description, difficulty } = req.body;
             const startDate = new Date();
             
             let fileInfo = {};
@@ -40,7 +40,6 @@ const manageAssignmentsController = {
                 description,
                 startDate,
                 endDate,
-                type,
                 difficulty,
                 fileInfo.filename || null,
                 fileInfo.originalFilename || null,

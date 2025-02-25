@@ -19,7 +19,6 @@ CREATE TABLE assignments (
   description TEXT NOT NULL,
   startDate DATE NOT NULL,
   endDate DATE NOT NULL,
-  type VARCHAR(255) NOT NULL,
   difficulty VARCHAR(255) NOT NULL,
   status VARCHAR(255) NOT NULL DEFAULT 'ACTIVE',
   filename TEXT NOT NULL DEFAULT 'no_file',
