@@ -65,12 +65,12 @@ INSERT INTO users (userName, password, email, role) VALUES
 ('Emma', 'password5', 'emma@example.com', 'student');
 
 -- Insert Assignments with Default File Information
-INSERT INTO assignments (userID, title, description, startDate, endDate, type, difficulty, status) VALUES
-(1, 'Math Homework', 'Solve 10 algebra problems', '2024-02-01', '2024-02-10', 'Homework', 'Medium', 'ACTIVE'),
-(2, 'Science Project', 'Build a volcano model', '2024-02-05', '2024-02-15', 'Project', 'Hard', 'ACTIVE'),
-(3, 'History Essay', 'Write about World War II', '2024-02-02', '2024-02-12', 'Essay', 'Medium', 'ACTIVE'),
-(4, 'Physics Lab Report', 'Document physics experiments', '2024-02-07', '2024-02-17', 'Lab', 'Hard', 'ACTIVE'),
-(5, 'Programming Quiz', 'Solve 5 coding problems', '2024-02-09', '2024-02-19', 'Quiz', 'Easy', 'ACTIVE');
+INSERT INTO assignments (userID, title, description, startDate, endDate, difficulty, status) VALUES
+(1, 'Math Homework', 'Solve 10 algebra problems', '2024-02-01', '2024-02-10', 'Medium', 'ACTIVE'),
+(2, 'Science Project', 'Build a volcano model', '2024-02-05', '2024-02-15', 'Hard', 'ACTIVE'),
+(3, 'History Essay', 'Write about World War II', '2024-02-02', '2024-02-12', 'Medium', 'ACTIVE'),
+(4, 'Physics Lab Report', 'Document physics experiments', '2024-02-07', '2024-02-17', 'Hard', 'ACTIVE'),
+(5, 'Programming Quiz', 'Solve 5 coding problems', '2024-02-09', '2024-02-19', 'Easy', 'ACTIVE');
 
 -- Insert Assignments Info (Users participating in each other's assignments)
 INSERT INTO assignmentsinfo (assignmentID, userID, status) VALUES

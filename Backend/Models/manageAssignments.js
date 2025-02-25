@@ -31,7 +31,7 @@ const manageAssignmentsModel = {
 
         const query = `
         INSERT INTO assignments (userID, title, description, startDate, endDate, type, difficulty, filename, originalFilename, filePath, fileType, fileSize, isZip)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+        VALUES ($1, $2, $3, $4, $5, $6, COALESCE($7, 'no_file'), COALESCE($8, 'no_file'), COALESCE($9, ''), COALESCE($10, 'unknown'), COALESCE($11, 0), COALESCE($12, FALSE))
         RETURNING *;`;
 
         try {
