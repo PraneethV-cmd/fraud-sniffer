@@ -22,7 +22,7 @@ const manageAssignmentsController = {
         try {
             const { userID, title, endDate, description, type, difficulty } = req.body;
             const startDate = new Date();
-
+            
             let fileInfo = {};
             if (req.file) {
                 fileInfo = {
@@ -34,7 +34,6 @@ const manageAssignmentsController = {
                     isZip: req.file.originalname.endsWith(".zip"),
                 };
             }
-
             const response = await manageAssignmentsModel.create(
                 userID,
                 title,

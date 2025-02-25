@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import { Box, Button, TextField, Typography, MenuItem, List, ListItem, ListItemText, IconButton, FormControl, FormLabel, Tooltip, Link } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
+import JSZip from "jszip";
 
 const difficulties = ["Easy", "Medium", "Hard"]; // Difficulty levels
 
@@ -13,32 +14,11 @@ export default function CreateAssignmentForm() {
   const [files, setFiles] = useState([]);
   const fileInputRef = useRef(null);
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-
-    // Create assignment:
-    // Body : {
-    //   otherFields: {
-    //                 "userID": 2,
-    //                 "title": "Data Structures Assignment",
-    //                 "description": "Solve 5 graph theory problems",
-    //                 "startDate": "2025-02-20",
-    //                 "endDate": "2025-02-28",
-    //                 "type": "Homework",
-    //                 "difficulty": "Hard",
-    //                 "status": "ACTIVE"
-    //               },
-    //   assignment: files;
-    // }
-    
-    // Handle form submission logic here
-    console.log({ title, description, startDate, dueDate, difficulty, files });
-  };
-
   const handleFileChange = (event) => {
     const newFiles = Array.from(event.target.files);
-    setFiles(prevFiles => [...prevFiles, ...newFiles]);
-    // Reset the file input value to ensure it updates correctly
+    setFiles((prevFiles) => [...prevFiles, ...newFiles]);
+
+    // Reset file input value
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -47,14 +27,79 @@ export default function CreateAssignmentForm() {
   const handleFileDelete = (index) => {
     const updatedFiles = files.filter((_, i) => i !== index);
     setFiles(updatedFiles);
-    // Reset the file input value to ensure it updates correctly
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-      const dataTransfer = new DataTransfer();
-      updatedFiles.forEach(file => dataTransfer.items.add(file));
-      fileInputRef.current.files = dataTransfer.files;
+  };
+
+  const zipFiles = async () => {
+    const zip = new JSZip();
+
+    // Add each file to the zip archive
+    files.forEach((file) => {
+      zip.file(file.name, file);
+    });
+
+    // Generate the zip file as a Blob
+    const blob = await zip.generateAsync({ type: "blob" });
+
+    // Convert Blob to File object
+    const zipFile = new File([blob], "assignment_files.zip", { type: "application/zip" });
+
+    return zipFile;
+  };
+
+  function getStatus(startDate, endDate){
+    const today = new Date();
+    if(today < startDate) return "NOT STARTED";
+    if(today > endDate) return "COMPLETED";
+    return "ACTIVE";
+  }
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (files.length === 0) {
+        alert("Please upload at least one file.");
+        return;
+    }
+
+    let fileToUpload;
+    if (files.length > 1) {
+        fileToUpload = await zipFiles(); // Zip all files
+    } else {
+        fileToUpload = files[0]; // Single file upload
+    }
+
+    // Create FormData object
+    const formData = new FormData();
+    formData.append("assignment", fileToUpload); // File
+    formData.append("otherfields", JSON.stringify({
+        userID: 2,
+        title: title,
+        description: description,
+        startDate: startDate,
+        endDate: dueDate,
+        type: "Homework",
+        difficulty: difficulty,
+        status: getStatus(startDate, dueDate)
+    })); // Convert object to JSON string
+
+    try {
+        const response = await fetch("http://localhost:8080/api/assignment/create", {
+            method: "POST",
+            body: formData, // FormData instead of raw JSON
+        });
+
+        if (response.ok) {
+            alert("Assignment uploaded successfully!");
+            setFiles([]);
+        } else {
+            alert("Error uploading assignment");
+        }
+    } catch (error) {
+        console.error("Upload error:", error);
+        alert("Upload failed");
     }
   };
+
 
   return (
     <Box component="form" onSubmit={handleSubmit} sx={{ mt: 4, maxHeight: '80vh', overflow: 'auto' }} className="create-assignment-page">
