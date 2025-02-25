@@ -6,6 +6,7 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
+import Button from "@mui/material/Button";
 import AccordionUsage from "./accordionManageAssignments";
 import CreateAssignmentForm from "./CreateAssignmentForm";
 import { Context } from "../context/context";
@@ -49,16 +50,6 @@ export default function ColorTabs() {
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
-  };
-
-  const handleEdit = (assignmentID) => {
-    alert(`Edit assignment ${assignmentID}`);
-    // TODO: Implement edit functionality
-  };
-
-  const handleDelete = (assignmentID) => {
-    alert(`Delete assignment ${assignmentID}`);
-    // TODO: Implement delete functionality
   };
 
   return (
@@ -125,12 +116,33 @@ export default function ColorTabs() {
                   <Typography variant="body2" sx={{ fontStyle: "italic", marginTop: "8px" }}>
                     Difficulty: {assignment.difficulty} | Status: {assignment.status}
                   </Typography>
+                  <Typography variant="body2" sx={{ fontWeight: "bold", color: "#1976D2" }}>
+                    Type: {assignment.type}
+                  </Typography>
                   <Typography variant="body2" color="textSecondary">
                     Start Date: {new Date(assignment.startdate).toLocaleString()}
                   </Typography>
                   <Typography variant="body2" color="textSecondary">
                     End Date: {new Date(assignment.enddate).toLocaleString()}
                   </Typography>
+
+                  {/* File Download Section */}
+                  {assignment.filepath && assignment.filepath !== "" && assignment.filepath !== "no_file" ? (
+                      <Typography variant="body2" sx={{ marginTop: "8px" }}>
+                          📄 File: 
+                          <a href={`http://localhost:8080/api/download/${assignment.filename}`} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            style={{ color: "#1976D2", fontWeight: "bold", textDecoration: "none" }}>
+                              {assignment.originalfilename || "Download File"}
+                          </a>
+                      </Typography>
+                  ) : (
+                      <Typography variant="body2" sx={{ marginTop: "8px", fontStyle: "italic" }}>
+                          No file uploaded.
+                      </Typography>
+                  )}
+
                 </CardContent>
               </Card>
             ))
@@ -162,7 +174,6 @@ export default function ColorTabs() {
         </Box>
       )}
 
-      
       {value === "Create Assignments" && <CreateAssignmentForm />}
       {value === "Check Plagiarism" && <div>Plagiarism Checker</div>}
     </Box>
