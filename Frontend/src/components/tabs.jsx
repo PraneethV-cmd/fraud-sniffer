@@ -2,12 +2,10 @@ import React, { useContext, useEffect, useState } from "react";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
-import Button from "@mui/material/Button";
 import AccordionUsage from "./accordionManageAssignments";
+import ViewAssignmentsAccordion from "./accordionViewAssignments";
 import CreateAssignmentForm from "./CreateAssignmentForm";
 import { Context } from "../context/context";
 
@@ -95,52 +93,8 @@ export default function ColorTabs() {
               <CircularProgress color="primary" />
             </Box>
           ) : assignmentList.length > 0 ? (
-            assignmentList.map((assignment) => (
-              <Card
-                key={`assignments-${assignment.assignmentinfoid}`}
-                sx={{
-                  marginBottom: 2,
-                  padding: 2,
-                  width: "100%",
-                  backgroundColor: "#f9f9f9",
-                  boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.1)",
-                }}
-              >
-                <CardContent>
-                  <Typography variant="h6" sx={{ fontWeight: "bold", color: "#1976D2" }}>
-                    {assignment.title}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary" mt={1}>
-                    {assignment.description}
-                  </Typography>
-                  <Typography variant="body2" sx={{ fontStyle: "italic", marginTop: "8px" }}>
-                    Difficulty: {assignment.difficulty} | Status: {assignment.status}
-                  </Typography>
-                  <Typography variant="body2" sx={{ fontWeight: "bold", color: "#1976D2" }}>
-                    Type: {assignment.type}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    Start Date: {new Date(assignment.startdate).toLocaleString()}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    End Date: {new Date(assignment.enddate).toLocaleString()}
-                  </Typography>
-
-                  {/* File Download Section */}
-                  {assignment.filepath && assignment.filepath !== "" && assignment.filepath !== "no_file" && (
-                      <Typography variant="body2" sx={{ marginTop: "8px" }}>
-                          📄 Resource : 
-                          <a href={`http://localhost:8080/api/download/${assignment.filename}`} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            style={{ color: "#1976D2", fontWeight: "bold", textDecoration: "none" }}>
-                              {assignment.originalfilename || "Download File"}
-                          </a>
-                      </Typography>
-                  )}
-
-                </CardContent>
-              </Card>
+            assignmentList.map((assignment, index) => (
+              <ViewAssignmentsAccordion key={`view_assignments-${assignment.assignmentinfoid}`} index={index} assignment={assignment} />
             ))
           ) : (
             <Typography variant="h6" textAlign="center" mt={4}>
