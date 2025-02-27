@@ -13,7 +13,15 @@ export default function ViewAssignmentsAccordion({ index, assignment }) {
 
   return (
     <div>
-      <Accordion key={index} sx={{ backgroundColor: "#f5f5f5", boxShadow: 2, borderRadius: "8px" }}>
+      <Accordion
+        key={index}
+        sx={{
+          background: "linear-gradient(to right, #f8f9fa, #e9ecef)",
+          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+          borderRadius: "12px",
+          overflow: "hidden",
+        }}
+      >
         <AccordionSummary
           expandIcon={<ExpandMoreIcon sx={{ color: "#1976D2" }} />}
           aria-controls={`panel${index}-content`}
@@ -24,19 +32,41 @@ export default function ViewAssignmentsAccordion({ index, assignment }) {
             width: "100%",
             backgroundColor: "#e3f2fd",
             borderBottom: "1px solid #ddd",
-            padding: "12px 16px",
+            padding: "14px 18px",
           }}
         >
-          <Typography component="span" sx={{ flexGrow: 1, fontWeight: "bold", fontSize: "1.1rem", color: "#333" }}>
+          <Typography
+            component="span"
+            sx={{
+              flexGrow: 1,
+              fontWeight: "bold",
+              fontSize: "1.2rem",
+              color: "#333",
+            }}
+          >
             {assignment.title} (Difficulty: {assignment.difficulty})
           </Typography>
         </AccordionSummary>
 
-        <AccordionDetails sx={{ padding: "16px", backgroundColor: "#fff" }}>
+        <AccordionDetails
+          sx={{
+            padding: "1.2rem",
+            background: "#ffffff",
+            borderRadius: "8px",
+            boxShadow: "inset 0px 2px 8px rgba(0, 0, 0, 0.05)",
+          }}
+        >
           <Typography sx={{ fontSize: "1rem", color: "#444", marginBottom: "8px" }}>
             <strong>Description:</strong> {assignment.description}
           </Typography>
-          <Typography sx={{ fontSize: "1rem", color: "#444", marginBottom: "8px" }}>
+          <Typography
+            sx={{
+              fontSize: "1rem",
+              color: assignment.status === "Completed" ? "green" : "orange",
+              fontWeight: "bold",
+              marginBottom: "8px",
+            }}
+          >
             <strong>Status:</strong> {assignment.status}
           </Typography>
           <Typography sx={{ fontSize: "1rem", color: "#444", marginBottom: "8px" }}>
@@ -48,13 +78,27 @@ export default function ViewAssignmentsAccordion({ index, assignment }) {
 
           {/* File Download Section */}
           {assignment.filepath && assignment.filepath !== "" && assignment.filepath !== "no_file" && (
-            <Typography variant="body2" sx={{ marginTop: "8px", fontSize: "0.95rem", color: "#1976D2", fontWeight: "bold" }}>
-              📄 Resource: {" "}
+            <Typography
+              variant="body2"
+              sx={{
+                marginTop: "8px",
+                fontSize: "0.95rem",
+                fontWeight: "bold",
+              }}
+            >
+              📄 Resource:{" "}
               <a
                 href={`http://localhost:8080/api/download/${assignment.filename}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ color: "#1976D2", fontWeight: "bold", textDecoration: "none" }}
+                style={{
+                  color: "#1976D2",
+                  fontWeight: "bold",
+                  textDecoration: "none",
+                  transition: "color 0.3s ease",
+                }}
+                onMouseOver={(e) => (e.target.style.color = "#0d47a1")}
+                onMouseOut={(e) => (e.target.style.color = "#1976D2")}
               >
                 {assignment.originalfilename || "Download File"}
               </a>
@@ -63,8 +107,29 @@ export default function ViewAssignmentsAccordion({ index, assignment }) {
         </AccordionDetails>
 
         {/* Submit Assignment Button */}
-        <Box sx={{ display: "flex", padding: "1rem", gap: 1, justifyContent: "flex-end", backgroundColor: "#e3f2fd", borderTop: "1px solid #ddd" }}>
-          <Button variant="contained" size="small" sx={{ backgroundColor: "#1976D2", color: "#fff" }} onClick={() => setOpen(true)}>
+        <Box
+          sx={{
+            display: "flex",
+            padding: "1rem",
+            gap: 1,
+            justifyContent: "flex-end",
+            backgroundColor: "#e3f2fd",
+            borderTop: "1px solid #ddd",
+          }}
+        >
+          <Button
+            variant="contained"
+            size="small"
+            sx={{
+              backgroundColor: "#1976D2",
+              color: "#fff",
+              textTransform: "none",
+              fontWeight: "bold",
+              transition: "0.3s ease",
+              "&:hover": { backgroundColor: "#0d47a1" },
+            }}
+            onClick={() => setOpen(true)}
+          >
             Submit Assignment
           </Button>
         </Box>

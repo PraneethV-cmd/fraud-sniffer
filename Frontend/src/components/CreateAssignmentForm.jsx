@@ -16,7 +16,6 @@ export default function CreateAssignmentForm() {
   const [showPopup, setShowPopup] = useState(false);
   const [confirmCreateAssignment, setConfirmCreateAssignment] = useState(false);
   const fileInputRef = useRef(null);
-  
 
   const handleFileChange = (event) => {
     const newFiles = Array.from(event.target.files);
@@ -43,7 +42,7 @@ export default function CreateAssignmentForm() {
   }
 
   const handleSubmit = async () => {
-    setConfirmCreateAssignment(false); // Close confirmation dialog
+    setConfirmCreateAssignment(false);
     setLoading(true);
 
     let fileToUpload = files.length > 1 ? await zipFiles() : files.length === 1 ? files[0] : null;
@@ -81,8 +80,8 @@ export default function CreateAssignmentForm() {
   };
 
   return (
-    <Box component="form" sx={{ mt: 4, maxHeight: '80vh', overflow: 'auto' }}>
-      <Typography variant="h6" gutterBottom>
+    <Box component="form" sx={{ mt: 4, p: 3, maxWidth: 600, mx: "auto", bgcolor: "background.paper", borderRadius: 2, boxShadow: 3, fontFamily: "Roboto" }}>
+      <Typography variant="h5" fontWeight="bold" gutterBottom textAlign="center">
         Create New Assignment
       </Typography>
       <TextField label="Assignment Title" fullWidth value={title} onChange={(e) => setTitle(e.target.value)} sx={{ mb: 2 }} />
@@ -113,12 +112,11 @@ export default function CreateAssignmentForm() {
         fullWidth 
         onClick={() => setConfirmCreateAssignment(true)} 
         disabled={loading}
-        sx={{ mb: 2 }}
+        sx={{ mb: 2, py: 1.5, fontSize: "1rem" }}
       >
         {loading ? <CircularProgress size={24} color="inherit" /> : "Submit Assignment"}
       </Button>
 
-      {/* Confirmation Dialog */}
       <Dialog open={confirmCreateAssignment} onClose={() => setConfirmCreateAssignment(false)}>
         <DialogTitle>Confirm Submission</DialogTitle>
         <DialogContent>
@@ -130,7 +128,6 @@ export default function CreateAssignmentForm() {
         </DialogActions>
       </Dialog>
 
-      {/* Popup for Response Message */}
       <Dialog open={showPopup} onClose={() => setShowPopup(false)}>
         <DialogTitle>Submission Status</DialogTitle>
         <DialogContent>

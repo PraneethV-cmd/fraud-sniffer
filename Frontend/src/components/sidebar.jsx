@@ -28,7 +28,8 @@ export default function CustomDrawer() {
     <Box
       sx={{
         width: 260,
-        backgroundColor: "#1e1e2d",
+        background: "rgba(30, 30, 45, 0.7)",
+        backdropFilter: "blur(10px)",
         height: "100vh",
         color: "#fff",
         paddingTop: "20px",
