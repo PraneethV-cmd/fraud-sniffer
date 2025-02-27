@@ -46,16 +46,16 @@ const manageAssignmentsModel = {
         return response;
     },
 
-    update: async (assignmentID, title, description, endDate) => {
+    update: async (assignmentID, title, description, startDate, endDate, difficulty) => {
 
         const query = `
         UPDATE assignments
-        SET title = $1, description = $2, endDate = $3
-        WHERE assignmentID = $4
+        SET title = $1, description = $2, startDate = $3, endDate = $4, difficulty = $5
+        WHERE assignmentID = $6
         RETURNING *;`;
 
         try {
-            const results = await dbPool.query(query, [title, description, endDate, assignmentID]);
+            const results = await dbPool.query(query, [title, description, startDate, endDate, difficulty, assignmentID]);
             if (results.rowCount === 0) throw new Error("Update failed");
 
             response.code = 200;

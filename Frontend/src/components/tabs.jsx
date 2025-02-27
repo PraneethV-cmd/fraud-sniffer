@@ -150,7 +150,7 @@ export default function ColorTabs() {
           ) : managableAssignments.length > 0 ? (
             <>
               {managableAssignments.map((assignment) => (
-                <AccordionUsage key={`manage_assignments-${assignment.assignmentid}`} title={assignment.title} description={assignment.description} difficulty={assignment.difficulty} status={assignment.status} startdate={assignment.startdate} enddate={assignment.enddate}/>
+                <AccordionUsage key={`manage_assignments-${assignment.assignmentid}`} title={assignment.title} description={assignment.description} difficulty={assignment.difficulty} status={assignment.status} startdate={assignment.startdate} enddate={assignment.enddate} assignmentID={assignment.assignmentid}/>
               ))}
             </>
           ) : (

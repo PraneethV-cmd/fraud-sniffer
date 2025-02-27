@@ -20,9 +20,8 @@ const manageAssignmentsController = {
 
     create: async (req, res) => {
         try {
-            const { userID, title, endDate, description, difficulty } = req.body;
-            const startDate = new Date();
-            
+            const { userID, title, startDate, endDate, description, difficulty } = req.body;
+
             let fileInfo = {};
             if (req.file) {
                 fileInfo = {
@@ -63,13 +62,15 @@ const manageAssignmentsController = {
     update: async (req, res) => {
         try {
             const assignmentID = req.params.assignmentID;
-            const { endDate, title, description } = req.body;
+            const { startDate, endDate, title, description, difficulty } = req.body;
 
             const response = await manageAssignmentsModel.update(
                 assignmentID,
                 title,
                 description,
-                endDate
+                startDate,
+                endDate,
+                difficulty
             );
 
             if (!response) {
