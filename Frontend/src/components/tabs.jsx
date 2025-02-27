@@ -52,39 +52,80 @@ export default function ColorTabs() {
 
   return (
     <Box sx={{ width: "100%", padding: "20px", paddingLeft: "40px" }}>
-      <Tabs
-        value={value}
-        onChange={handleChange}
-        textColor="secondary"
-        indicatorColor="secondary"
-        sx={{
-          display: "flex",
-          justifyContent: "flex-start",
-          borderBottom: 1,
-          borderColor: "divider",
-        }}
-      >
-        <Tab
-          value="View Assignments"
-          label="📚 View Assignments"
-          sx={{ fontWeight: "bold", color: "#1976D2", textTransform: "none" }}
-        />
-        <Tab
-          value="Manage Assignments"
-          label="📔 Manage Assignments"
-          sx={{ fontWeight: "bold", color: "#1976D2", textTransform: "none" }}
-        />
-        <Tab
-          value="Create Assignments"
-          label="✍️ Create Assignments"
-          sx={{ fontWeight: "bold", color: "#1976D2", textTransform: "none" }}
-        />
-        <Tab
-          value="Check Plagiarism"
-          label="🔍 Check Plagiarism"
-          sx={{ fontWeight: "bold", color: "#1976D2", textTransform: "none" }}
-        />
-      </Tabs>
+
+<Tabs
+  value={value}
+  onChange={handleChange}
+  textColor="secondary"
+  indicatorColor="secondary"
+  sx={{
+    display: "flex",
+    justifyContent: "flex-start",
+    borderBottom: 1,
+    borderColor: "divider",
+  }}
+>
+  <Tab
+    value="View Assignments"
+    label={<span>📚 View Assignments</span>}
+    sx={{
+      fontWeight: "bold",
+      color: "#1976D2",
+      textTransform: "none",
+      transition: "transform 0.3s, color 0.3s, letter-spacing 0.4s",
+      "&:hover": {
+        color: "#004ba0",
+        transform: "rotate(-5deg)",
+        letterSpacing: "4px",
+      },
+    }}
+  />
+  <Tab
+    value="Manage Assignments"
+    label={<span>📔 Manage Assignments</span>}
+    sx={{
+      fontWeight: "bold",
+      color: "#1976D2",
+      textTransform: "none",
+      transition: "transform 0.3s, color 0.3s, letter-spacing 0.4s",
+      "&:hover": {
+        color: "#004ba0",
+        transform: "rotate(-5deg)",
+        letterSpacing: "4px",
+      },
+    }}
+  />
+  <Tab
+    value="Create Assignments"
+    label={<span>✍️ Create Assignments</span>}
+    sx={{
+      fontWeight: "bold",
+      color: "#1976D2",
+      textTransform: "none",
+      transition: "transform 0.3s, color 0.3s, letter-spacing 0.4s",
+      "&:hover": {
+        color: "#004ba0",
+        transform: "rotate(-5deg)",
+        letterSpacing: "4px",
+      },
+    }}
+  />
+  <Tab
+    value="Check Plagiarism"
+    label={<span>🔍 Check Plagiarism</span>}
+    sx={{
+      fontWeight: "bold",
+      color: "#1976D2",
+      textTransform: "none",
+      transition: "transform 0.3s, color 0.3s, letter-spacing 0.4s",
+      "&:hover": {
+        color: "#004ba0",
+        transform: "rotate(-5deg)",
+        letterSpacing: "4px",
+      },
+    }}
+  />
+</Tabs>
 
       {value === "View Assignments" && (
         <Box sx={{ marginTop: 2, width: "100%" }}>
