@@ -13,15 +13,15 @@
 }
 
 .sidebar {
-    background-color:#B85042;
-    color: #A7BEAE;
+    background: #EEE2DC;
+    color: #e0e8a3;
     min-height: 100vh;
     padding-top: 2rem;
 }
 
 .main {
     flex-grow: 1;
-    background-color:#E7E8D1;
+    background-color:#EDC7B7;
     padding: 1.5rem;
 }
 
