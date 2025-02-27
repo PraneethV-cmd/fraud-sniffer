@@ -23,7 +23,7 @@ router.post("/create", upload.single("assignment"), async (req, res) => {
 
         
         // Call the controller create method
-        const result = await manageAssignmentsController.create({
+        await manageAssignmentsController.create({
             ...req,
             body: parsedBody,
             file: req.file
@@ -36,7 +36,7 @@ router.post("/create", upload.single("assignment"), async (req, res) => {
 });
 
 
-router.post("/:assignmentID/upload", upload.single("assignment"), manageAssignmentsController.uploadFile);
+router.post("/:assignmentID/submit", upload.single("assignment"), manageAssignmentsController.submit);
 // router.get("/view/:id", manageAssignmentsController.downloadFile); - Created an alternative route download/filename
 
 router.post("/join", manageAssignmentsController.joinAssignment);

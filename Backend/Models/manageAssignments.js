@@ -44,7 +44,6 @@ const manageAssignmentsModel = {
             const results = await dbPool.query(query, paramsWithJoinCode);
             response.code = 201;
             response.body.message = results.rows[0];
-            console.log("[LOG] Assignment created with join code:", joinCode);
         } catch (error) {
             response.code = 500;
             response.body.message = error.message;
@@ -232,6 +231,45 @@ const manageAssignmentsModel = {
 
         return response;
     },
+
+    submit: async(userID, assignmentID, file) => {
+        const currDate = new Date();
+        try{
+            const getAssignmentInfo = await dbPool.query(`
+                SELECT * 
+                FROM assignmentsinfo
+                WHERE assignmentID = $1 AND userID = $2;
+                `
+            , [assignmentID, userID]);
+
+            const assignmentInfoID = getAssignmentInfo.rows[0].assignmentinfoid;
+            
+            const query = `
+            UPDATE submissions
+            SET 
+                filename = $2,
+                originalFilename = $3,
+                filePath = $4,
+                fileType = $5,
+                fileSize = $6,
+                isZip = $7,
+                submissionDate = $8,
+                submissionStatus = $9
+            WHERE assignmentInfoID = $1;
+            `;
+    
+            await dbPool.query(query, [assignmentInfoID, file.filename, file.originalFilename, file.filePath, file.fileType, file.fileSize, file.isZip, currDate, 'SUBMITTED']);
+
+            response.code = 201;
+            response.body.message = "Assignment Submitted Successfully."
+        } catch (error) {
+            response.code = 500;
+            response.body.message = error.message;
+            console.error("[ERROR in manageAssignmentsModel.submit]:", error);
+        }
+
+        return response;
+    }
 };
 
 module.exports = manageAssignmentsModel;

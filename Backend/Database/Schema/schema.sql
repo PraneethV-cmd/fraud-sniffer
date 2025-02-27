@@ -58,7 +58,7 @@ CREATE TABLE submissions (
   fileSize BIGINT NOT NULL DEFAULT 0,
   isZip BOOLEAN DEFAULT FALSE,
   submissionDate TIMESTAMP,
-  status VARCHAR(255) NOT NULL DEFAULT 'PENDING',
+  submissionStatus VARCHAR(255) NOT NULL DEFAULT 'PENDING',
   FOREIGN KEY (assignmentInfoID) REFERENCES assignmentsinfo(assignmentInfoID) ON DELETE CASCADE
 );
 

@@ -144,11 +144,14 @@ const manageAssignmentsController = {
         }
     },
 
-    uploadFile: async (req, res) => {
+    submit: async (req, res) => {
         try {
             if (!req.file) {
                 return res.status(400).json({ error: "No file uploaded" });
             }
+            const assignmentID = req.params.assignmentID;
+
+            const { userID } = JSON.parse(req.body.otherfields);
 
             const fileInfo = {
                 filename: req.file.filename,
@@ -159,16 +162,10 @@ const manageAssignmentsController = {
                 isZip: req.file.originalname.endsWith(".zip"),
             };
 
-            const response = await manageAssignmentsModel.create(fileInfo);
+            const response = await manageAssignmentsModel.submit(userID, assignmentID, fileInfo);
 
-            if (!response || !response.fileId) {
-                return res.status(500).json({ error: "File upload failed" });
-            }
-
-            res.status(201).json({
-                message: "File uploaded successfully",
-                fileId: response.fileId,
-                ...fileInfo,
+            res.status(response.code).json({
+                message: response.body.message
             });
         } catch (err) {
             console.error("Upload error:", err);
