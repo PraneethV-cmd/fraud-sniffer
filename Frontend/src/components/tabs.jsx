@@ -75,7 +75,6 @@ export default function ColorTabs() {
       transition: "transform 0.3s, color 0.3s, letter-spacing 0.4s",
       "&:hover": {
         color: "#004ba0",
-        transform: "rotate(-5deg)",
         letterSpacing: "4px",
       },
     }}
@@ -90,7 +89,6 @@ export default function ColorTabs() {
       transition: "transform 0.3s, color 0.3s, letter-spacing 0.4s",
       "&:hover": {
         color: "#004ba0",
-        transform: "rotate(-5deg)",
         letterSpacing: "4px",
       },
     }}
@@ -105,7 +103,6 @@ export default function ColorTabs() {
       transition: "transform 0.3s, color 0.3s, letter-spacing 0.4s",
       "&:hover": {
         color: "#004ba0",
-        transform: "rotate(-5deg)",
         letterSpacing: "4px",
       },
     }}
@@ -120,7 +117,6 @@ export default function ColorTabs() {
       transition: "transform 0.3s, color 0.3s, letter-spacing 0.4s",
       "&:hover": {
         color: "#004ba0",
-        transform: "rotate(-5deg)",
         letterSpacing: "4px",
       },
     }}
