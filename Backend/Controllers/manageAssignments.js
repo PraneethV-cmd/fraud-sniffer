@@ -1,5 +1,5 @@
 const manageAssignmentsModel = require("../Models/manageAssignments");
-const fs = require("fs");
+// const fs = require("fs");
 
 const manageAssignmentsController = {
     get: async (req, res) => {
@@ -176,26 +176,48 @@ const manageAssignmentsController = {
         }
     },
 
-    downloadFile: async (req, res) => {
+    // downloadFile: async (req, res) => {
+    //     try {
+    //         const { id } = req.params;
+    //         console.log("Requested ID:", id);
+    //         const file = await manageAssignmentsModel.get(id);
+    //         if (!file) {
+    //             console.error(`File not found in DB for ID: ${id}`);
+    //             return res.status(404).json({ error: "File not found" });
+    //         }
+    //         console.log("File Retrieved:", file);
+    //         if (!fs.existsSync(file.filePath)) {
+    //             console.error(`File missing on server: ${file.filePath}`);
+    //             return res.status(404).json({ error: "File not found on server" });
+    //         }
+    //         res.download(file.filePath, file.originalFilename);
+    //     } catch (err) {
+    //         console.error("Download error:", err);
+    //         res.status(500).json({ error: "Downloading failed" });
+    //     }
+    // },
+
+    joinAssignment: async (req, res) => {
+        const { joinCode, userID } = req.body;
+
+        if(!joinCode || !userID) {
+            return res.status(400).json({ error: "Join code and userID are required" });
+        }
+
         try {
-            const { id } = req.params;
-            console.log("Requested ID:", id);
-            const file = await manageAssignmentsModel.get(id);
-            if (!file) {
-                console.error(`File not found in DB for ID: ${id}`);
-                return res.status(404).json({ error: "File not found" });
+            const result = await manageAssignmentsModel.joinAssignment(joinCode, userID);
+            if (result.code !== 200){
+                return res.status(result.code).json({ error: result.body.message });
             }
-            console.log("File Retrieved:", file);
-            if (!fs.existsSync(file.filePath)) {
-                console.error(`File missing on server: ${file.filePath}`);
-                return res.status(404).json({ error: "File not found on server" });
-            }
-            res.download(file.filePath, file.originalFilename);
+
+            console.log(`[LOG]: user ${userID} joined assignment ${joinCode}, ${result.body.message}`);
+            return res.status(result.code).json(result.body.message);
         } catch (err) {
-            console.error("Download error:", err);
-            res.status(500).json({ error: "Downloading failed" });
+            console.error("[ERROR] Join assignment error:", err);
+            return res.status(500).json({ error: "Server error" });
         }
     }
+
 };
 
 module.exports = manageAssignmentsController;
