@@ -1,19 +1,11 @@
-import React, { useEffect, useState } from "react";
-import CreateAssignmentForm from "./CreateAssignmentForm";
 import React, { useContext, useEffect, useState } from "react";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
-import IconButton from "@mui/material/IconButton";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import AccordionUsage from "./accordion";
-import CreateAssignmentForm from "./CreateAssignmentForm";  
 import AccordionUsage from "./accordionManageAssignments";
+import ViewAssignmentsAccordion from "./accordionViewAssignments";
 import CreateAssignmentForm from "./CreateAssignmentForm";
 import { Context } from "../context/context";
 
@@ -43,8 +35,8 @@ export default function ColorTabs() {
       .then(([participantData, ownerData]) => {
         console.log("Participant:", participantData);
         console.log("Owner:", ownerData);
-        setAssignmentList(participantData.rows);
-        setManagableAssignments(ownerData.rows);
+        setAssignmentList(participantData);
+        setManagableAssignments(ownerData);
       })
       .catch((err) => {
         console.error("Error fetching assignments:", err);
@@ -58,51 +50,82 @@ export default function ColorTabs() {
     setValue(newValue);
   };
 
-  const handleEdit = (assignmentID) => {
-    alert(`Edit assignment ${assignmentID}`);
-    // TODO: Implement edit functionality
-  };
-
-  const handleDelete = (assignmentID) => {
-    alert(`Delete assignment ${assignmentID}`);
-    // TODO: Implement delete functionality
-  };
-
   return (
     <Box sx={{ width: "100%", padding: "20px", paddingLeft: "40px" }}>
-      <Tabs
-        value={value}
-        onChange={handleChange}
-        textColor="secondary"
-        indicatorColor="secondary"
-        sx={{
-          display: "flex",
-          justifyContent: "flex-start",
-          borderBottom: 1,
-          borderColor: "divider",
-        }}
-      >
-        <Tab
-          value="View Assignments"
-          label="📚 View Assignments"
-          sx={{ fontWeight: "bold", color: "#1976D2", textTransform: "none" }}
-        />
-        <Tab
-          value="Manage Assignments"
-          label="📔 Manage Assignments"
-          sx={{ fontWeight: "bold", color: "#1976D2", textTransform: "none" }}
-        />
-        <Tab
-          value="Create Assignments"
-          label="✍️ Create Assignments"
-          sx={{ fontWeight: "bold", color: "#1976D2", textTransform: "none" }}
-        />
-        <Tab
-          value="Check Plagiarism"
-          label="🔍 Check Plagiarism"
-          sx={{ fontWeight: "bold", color: "#1976D2", textTransform: "none" }}
-        />
-      </Tabs>
+
+<Tabs
+  value={value}
+  onChange={handleChange}
+  textColor="secondary"
+  indicatorColor="secondary"
+  sx={{
+    display: "flex",
+    justifyContent: "flex-start",
+    borderBottom: 1,
+    borderColor: "divider",
+  }}
+>
+  <Tab
+    value="View Assignments"
+    label={<span>📚 View Assignments</span>}
+    sx={{
+      fontWeight: "bold",
+      color: "#1976D2",
+      textTransform: "none",
+      transition: "transform 0.3s, color 0.3s, letter-spacing 0.4s",
+      "&:hover": {
+        color: "#004ba0",
+        transform: "rotate(-5deg)",
+        letterSpacing: "4px",
+      },
+    }}
+  />
+  <Tab
+    value="Manage Assignments"
+    label={<span>📔 Manage Assignments</span>}
+    sx={{
+      fontWeight: "bold",
+      color: "#1976D2",
+      textTransform: "none",
+      transition: "transform 0.3s, color 0.3s, letter-spacing 0.4s",
+      "&:hover": {
+        color: "#004ba0",
+        transform: "rotate(-5deg)",
+        letterSpacing: "4px",
+      },
+    }}
+  />
+  <Tab
+    value="Create Assignments"
+    label={<span>✍️ Create Assignments</span>}
+    sx={{
+      fontWeight: "bold",
+      color: "#1976D2",
+      textTransform: "none",
+      transition: "transform 0.3s, color 0.3s, letter-spacing 0.4s",
+      "&:hover": {
+        color: "#004ba0",
+        transform: "rotate(-5deg)",
+        letterSpacing: "4px",
+      },
+    }}
+  />
+  <Tab
+    value="Check Plagiarism"
+    label={<span>🔍 Check Plagiarism</span>}
+    sx={{
+      fontWeight: "bold",
+      color: "#1976D2",
+      textTransform: "none",
+      transition: "transform 0.3s, color 0.3s, letter-spacing 0.4s",
+      "&:hover": {
+        color: "#004ba0",
+        transform: "rotate(-5deg)",
+        letterSpacing: "4px",
+      },
+    }}
+  />
+</Tabs>
 
       {value === "View Assignments" && (
         <Box sx={{ marginTop: 2, width: "100%" }}>
@@ -111,35 +134,8 @@ export default function ColorTabs() {
               <CircularProgress color="primary" />
             </Box>
           ) : assignmentList.length > 0 ? (
-            assignmentList.map((assignment) => (
-              <Card
-                key={`assignments-${assignment.assignmentinfoid}`}
-                sx={{
-                  marginBottom: 2,
-                  padding: 2,
-                  width: "100%",
-                  backgroundColor: "#f9f9f9",
-                  boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.1)",
-                }}
-              >
-                <CardContent>
-                  <Typography variant="h6" sx={{ fontWeight: "bold", color: "#1976D2" }}>
-                    {assignment.title}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary" mt={1}>
-                    {assignment.description}
-                  </Typography>
-                  <Typography variant="body2" sx={{ fontStyle: "italic", marginTop: "8px" }}>
-                    Difficulty: {assignment.difficulty} | Status: {assignment.status}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    Start Date: {new Date(assignment.startdate).toLocaleString()}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    End Date: {new Date(assignment.enddate).toLocaleString()}
-                  </Typography>
-                </CardContent>
-              </Card>
+            assignmentList.map((assignment, index) => (
+              <ViewAssignmentsAccordion key={`view_assignments-${assignment.assignmentinfoid}`} index={index} assignment={assignment} />
             ))
           ) : (
             <Typography variant="h6" textAlign="center" mt={4}>
@@ -169,7 +165,6 @@ export default function ColorTabs() {
         </Box>
       )}
 
-      
       {value === "Create Assignments" && <CreateAssignmentForm />}
       {value === "Check Plagiarism" && <div>Plagiarism Checker</div>}
     </Box>

@@ -6,7 +6,7 @@ import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
-import FormDialog from "./formDialog"; // Import the updated dialog
+import { FormDialogEditAssignment } from "./formDialog"; // Import the updated dialog
 
 export default function AccordionUsage({ index, title, description, difficulty, status, startdate, enddate }) {
   const [open, setOpen] = useState(false);
@@ -66,7 +66,7 @@ export default function AccordionUsage({ index, title, description, difficulty, 
       </Accordion>
 
       {/* Edit Dialog */}
-      <FormDialog open={open} onClose={() => setOpen(false)} assignment={assignmentData} onSave={handleSave} />
+      <FormDialogEditAssignment open={open} onClose={() => setOpen(false)} assignment={assignmentData} onSave={handleSave} />
     </div>
   );
 }

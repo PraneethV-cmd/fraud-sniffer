@@ -20,9 +20,9 @@ const manageAssignmentsController = {
 
     create: async (req, res) => {
         try {
-            const { userId, title, endDate, description, type, difficulty } = req.body;
+            const { userID, title, endDate, description, difficulty } = req.body;
             const startDate = new Date();
-
+            
             let fileInfo = {};
             if (req.file) {
                 fileInfo = {
@@ -34,14 +34,12 @@ const manageAssignmentsController = {
                     isZip: req.file.originalname.endsWith(".zip"),
                 };
             }
-
             const response = await manageAssignmentsModel.create(
-                userId,
+                userID,
                 title,
                 description,
                 startDate,
                 endDate,
-                type,
                 difficulty,
                 fileInfo.filename || null,
                 fileInfo.originalFilename || null,
@@ -101,36 +99,38 @@ const manageAssignmentsController = {
         }
     },
 
-    filter: async (req, res) => {
-        try {
-            const { title, difficulty, status, startDate, endDate } = req.query;
-            const response = await manageAssignmentsModel.filter(
-                title,
-                difficulty,
-                status,
-                startDate,
-                endDate
-            );
+    //Not requires as far now.
+    
+    // filter: async (req, res) => {
+    //     try {
+    //         const { title, difficulty, status, startDate, endDate } = req.query;
+    //         const response = await manageAssignmentsModel.filter(
+    //             title,
+    //             difficulty,
+    //             status,
+    //             startDate,
+    //             endDate
+    //         );
 
-            if (!response) {
-                return res.status(500).json({ error: "Filtering failed" });
-            }
+    //         if (!response) {
+    //             return res.status(500).json({ error: "Filtering failed" });
+    //         }
 
-            res.status(response.code).json(response.body.message);
-        } catch (err) {
-            console.error("Filtering error:", err);
-            res.status(500).json({ error: "Server error" });
-        }
-    },
+    //         res.status(response.code).json(response.body.message);
+    //     } catch (err) {
+    //         console.error("Filtering error:", err);
+    //         res.status(500).json({ error: "Server error" });
+    //     }
+    // },
 
     view: async (req, res) => {
         try {
-            const { userId, type } = req.query;
-            if (!userId) {
-                return res.status(400).json({ error: "UserID is required" });
+            const { userID, type } = req.query;
+            if (!userID) {
+                return res.status(400).json({ error: "userID is required" });
             }
 
-            const response = await manageAssignmentsModel.view(userId, type);
+            const response = await manageAssignmentsModel.view(userID, type);
 
             if (!response) {
                 return res.status(500).json({ error: "View failed" });

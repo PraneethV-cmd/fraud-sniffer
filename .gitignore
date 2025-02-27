@@ -13,8 +13,11 @@ resources/sass/.sass-cache/
 resources/.arch-internal-preview.css
 .arch-internal-preview.css
 
+.venv
 
 node_modules
 .env
 package-lock.json
 test.js
+
+uploads

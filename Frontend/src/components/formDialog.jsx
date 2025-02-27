@@ -6,6 +6,7 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import MenuItem from "@mui/material/MenuItem";
+import Input from "@mui/material/Input";
 
 /**
  * FormDialog Component for Editing Assignments
@@ -15,7 +16,7 @@ import MenuItem from "@mui/material/MenuItem";
  * @param {Object} props.assignment - Assignment data to be edited
  * @param {Function} props.onSave - Function to save updated assignment
  */
-export default function FormDialog({ open, onClose, assignment, onSave }) {
+export function FormDialogEditAssignment({ open, onClose, assignment, onSave }) {
   const [formData, setFormData] = React.useState({
     title: assignment?.title || "",
     description: assignment?.description || "",
@@ -129,6 +130,70 @@ export default function FormDialog({ open, onClose, assignment, onSave }) {
           </DialogActions>
         </form>
       </DialogContent>
+    </Dialog>
+  );
+}
+
+
+export function FormDialogSubmitAssignment({ open, onClose, assignmentID }) {
+  const [file, setFile] = React.useState(null);
+  const [comments, setComments] = React.useState("");
+
+  const handleFileChange = (event) => {
+    setFile(event.target.files[0]);
+  };
+
+  const handleSubmit = async () => {
+    if (!file) {
+      alert("Please select a file to upload.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("assignmentID", assignmentID);
+    formData.append("file", file);
+    formData.append("comments", comments);
+
+    try {
+      const response = await fetch("http://localhost:8080/api/submit-assignment", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        alert("Assignment submitted successfully!");
+        onClose();
+      } else {
+        alert("Failed to submit assignment.");
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      alert("Upload failed.");
+    }
+  };
+
+  return (
+    <Dialog open={open} onClose={onClose}>
+      <DialogTitle>Submit Assignment</DialogTitle>
+      <DialogContent>
+        <TextField
+          fullWidth
+          label="Comments (Optional)"
+          variant="outlined"
+          value={comments}
+          onChange={(e) => setComments(e.target.value)}
+          sx={{ marginBottom: 2 }}
+        />
+        <Input type="file" onChange={handleFileChange} />
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose} color="secondary">
+          Cancel
+        </Button>
+        <Button onClick={handleSubmit} color="primary" variant="contained">
+          Submit
+        </Button>
+      </DialogActions>
     </Dialog>
   );
 }

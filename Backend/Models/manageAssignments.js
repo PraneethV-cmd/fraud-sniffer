@@ -1,8 +1,14 @@
 const dbPool = require("../Database/createPool");
 
+const response = {
+    code: 503, 
+    body: { 
+        message: "" 
+    } 
+};
+
 const manageAssignmentsModel = {
     get: async (assignmentID) => {
-        const response = { code: 503, body: { message: "" } };
 
         const query = `SELECT * FROM assignments WHERE assignmentID = $1;`;
 
@@ -22,11 +28,9 @@ const manageAssignmentsModel = {
     },
 
     create: async (...params) => {
-        const response = { code: 503, body: { message: "" } };
-
         const query = `
-        INSERT INTO assignments (userID, title, description, startDate, endDate, type, difficulty, filename, originalFilename, filePath, fileType, fileSize, isZip)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+        INSERT INTO assignments (userID, title, description, startDate, endDate, difficulty, filename, originalFilename, filePath, fileType, fileSize, isZip)
+        VALUES ($1, $2, $3, $4, $5, $6, COALESCE($7, 'no_file'), COALESCE($8, 'no_file'), COALESCE($9, ''), COALESCE($10, 'unknown'), COALESCE($11, 0), COALESCE($12, FALSE))
         RETURNING *;`;
 
         try {
@@ -43,7 +47,6 @@ const manageAssignmentsModel = {
     },
 
     update: async (assignmentID, title, description, endDate) => {
-        const response = { code: 503, body: { message: "" } };
 
         const query = `
         UPDATE assignments
@@ -67,7 +70,6 @@ const manageAssignmentsModel = {
     },
 
     delete: async (assignmentID) => {
-        const response = { code: 503, body: { message: "" } };
 
         const query = `DELETE FROM assignments WHERE assignmentID = $1 RETURNING *;`;
 
@@ -87,7 +89,6 @@ const manageAssignmentsModel = {
     },
 
     filter: async (title, difficulty, status, startDate, endDate) => {
-        const response = { code: 503, body: { message: "" } };
 
         try {
             const conditions = [];
@@ -134,7 +135,6 @@ const manageAssignmentsModel = {
     },
 
     view: async (userID, type) => {
-        const response = { code: 503, body: { message: "" } };
 
         try {
             let query = "";
