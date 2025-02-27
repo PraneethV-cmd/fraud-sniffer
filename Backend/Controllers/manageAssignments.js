@@ -194,6 +194,48 @@ const manageAssignmentsController = {
             console.error("Download error:", err);
             res.status(500).json({ error: "Downloading failed" });
         }
+    },
+
+    joinAssignment: async (req, res) => {
+        const { joinCode, userID } = req.body;
+
+        if(!joinCode || !userID) {
+            return res.status(400).json({ error: "Join code and userID are required" });
+        }
+
+        try {
+            const result = await manageAssignmentsModel.joinAssignment(joinCode, userID);
+            if (result.code !== 200){
+                return res.status(result.code).json({ error: result.body.message });
+            }
+
+            console.log(`[LOG]: user ${userID} joined assignment ${joinCode}, ${result.body.message}`);
+            return res.status(result.code).json(result.body.message);
+        } catch (err) {
+            console.error("[ERROR] Join assignment error:", err);
+            return res.status(500).json({ error: "Server error" });
+        }
+    },
+
+    getAssignmentHistory: async (req, res) => {
+        try {
+            const { userID } = req.query;
+            if (!userID) {
+                return res.status(400).json({ error: "userID is required" });
+            }
+
+            const response = await manageAssignmentsModel.getAssignmentHistory(userID);
+
+            if (!response) {
+                return res.status(500).json({ error: "View failed" });
+            }
+
+            console.log(`[LOG] Retrived assignmnet history for the user: ${userID}`)
+            res.status(response.code).json(response.body.message);
+        } catch (err) {
+            console.error("View error:", err);
+            res.status(500).json({ error: "Server error" });
+        }
     }
 };
 
