@@ -1,12 +1,10 @@
--- Drop tables if they exist to avoid conflicts
+--Drop all table if already exists
 DROP TABLE IF EXISTS assignment_participants CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS assignments CASCADE;
 DROP TABLE IF EXISTS assignmentsinfo CASCADE;
 DROP TABLE IF EXISTS submissions CASCADE;
 DROP TABLE IF EXISTS plagiarism_reports CASCADE;
-
-CREATE EXTENSION IF NOT EXISTS pgcrypto; 
 
 -- Create Users Table with Hashed Password Support
 CREATE TABLE users (
@@ -34,13 +32,9 @@ CREATE TABLE assignments (
   fileSize BIGINT NOT NULL DEFAULT 0,
   isZip BOOLEAN DEFAULT FALSE,
   uploadDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  join_code TEXT UNIQUE CHECK (LENGTH(join_code) > 5), -- Longer secure join code
-  join_code_expires_at TIMESTAMP DEFAULT NULL, -- Expiry for join codes
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  join_code TEXT NOT NULL UNIQUE CHECK (LENGTH(join_code) > 5),
   FOREIGN KEY (userID) REFERENCES users(userID) ON DELETE CASCADE ON UPDATE CASCADE
 );
-
-CREATE UNIQUE INDEX idx_assignments_join_code ON assignments (LOWER(join_code)); -- Ensure case-insensitive uniqueness
 
 -- Create Assignments Info Table with ENUM-like Status Check
 CREATE TABLE assignmentsinfo (
@@ -63,8 +57,8 @@ CREATE TABLE submissions (
   fileType VARCHAR(50) NOT NULL DEFAULT 'unknown',
   fileSize BIGINT NOT NULL DEFAULT 0,
   isZip BOOLEAN DEFAULT FALSE,
-  submissionDate TIMESTAMP NOT NULL,
-  status VARCHAR(255) NOT NULL DEFAULT 'Pending',
+  submissionDate TIMESTAMP,
+  status VARCHAR(255) NOT NULL DEFAULT 'PENDING',
   FOREIGN KEY (assignmentInfoID) REFERENCES assignmentsinfo(assignmentInfoID) ON DELETE CASCADE
 );
 
@@ -77,21 +71,21 @@ CREATE TABLE plagiarism_reports (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Insert Users with Hashed Passwords (Use bcrypt in backend)
+-- Insert Users details.
 INSERT INTO users (userName, password, email, role) VALUES
-('Alice', crypt('password1', gen_salt('bf')), 'alice@example.com', 'student'),
-('Bob', crypt('password2', gen_salt('bf')), 'bob@example.com', 'student'),
-('Charlie', crypt('password3', gen_salt('bf')), 'charlie@example.com', 'student'),
-('David', crypt('password4', gen_salt('bf')), 'david@example.com', 'instructor'),
-('Emma', crypt('password5', gen_salt('bf')), 'emma@example.com', 'student');
+('user1', 'user1', 'alice@example.com', 'student'),
+('user2', 'user2', 'bob@example.com', 'student'),
+('user3', 'user3', 'charlie@example.com', 'student'),
+('user4', 'user4', 'david@example.com', 'instructor'),
+('user5', 'user5', 'emma@example.com', 'student');
 
 -- Insert Assignments with Default File Information
-INSERT INTO assignments (userID, title, description, startDate, endDate, difficulty, status, join_code, join_code_expires_at) VALUES
-(1, 'Math Homework', 'Solve 10 algebra problems', '2024-02-01', '2024-02-10', 'Medium', 'ACTIVE', MD5(RANDOM()::TEXT), NOW() + INTERVAL '7 days'),
-(2, 'Science Project', 'Build a volcano model', '2024-02-05', '2024-02-15', 'Hard', 'ACTIVE', MD5(RANDOM()::TEXT), NOW() + INTERVAL '7 days'),
-(3, 'History Essay', 'Write about World War II', '2024-02-02', '2024-02-12', 'Medium', 'ACTIVE', MD5(RANDOM()::TEXT), NOW() + INTERVAL '7 days'),
-(4, 'Physics Lab Report', 'Document physics experiments', '2024-02-07', '2024-02-17', 'Hard', 'ACTIVE', MD5(RANDOM()::TEXT), NOW() + INTERVAL '7 days'),
-(5, 'Programming Quiz', 'Solve 5 coding problems', '2024-02-09', '2024-02-19', 'Easy', 'ACTIVE', MD5(RANDOM()::TEXT), NOW() + INTERVAL '7 days');
+INSERT INTO assignments (userID, title, description, startDate, endDate, difficulty, status, join_code) VALUES
+(1, 'Math Homework', 'Solve 10 algebra problems', '2024-02-01', '2024-02-10', 'Medium', 'ACTIVE', 'A12345'),
+(2, 'Science Project', 'Build a volcano model', '2024-02-05', '2024-02-15', 'Hard', 'ACTIVE', 'B12345'),
+(3, 'History Essay', 'Write about World War II', '2024-02-02', '2024-02-12', 'Medium', 'ACTIVE', 'C12345'),
+(4, 'Physics Lab Report', 'Document physics experiments', '2024-02-07', '2024-02-17', 'Hard', 'ACTIVE', 'D12345'),
+(5, 'Programming Quiz', 'Solve 5 coding problems', '2024-02-09', '2024-02-19', 'Easy', 'ACTIVE', 'E12345');
 
 
 -- Insert Assignments Info (Users participating in each other's assignments)
@@ -107,11 +101,13 @@ INSERT INTO assignmentsinfo (assignmentID, userID, status) VALUES
 (5, 4, 'PENDING');
 
 -- Insert Submissions (Users submitting their work)
-INSERT INTO submissions (assignmentInfoID, submissionDate) VALUES
-(1, '2024-02-08'),
-(2, '2024-02-09'),
-(3, '2024-02-12'),
-(4, '2024-02-13'),
-(5, '2024-02-15'),
-(6, '2024-02-16'),
-(7, '2024-02-18');
+INSERT INTO submissions (assignmentInfoID) VALUES
+(1),
+(2),
+(3),
+(4),
+(5),
+(6),
+(7),
+(8),
+(9);

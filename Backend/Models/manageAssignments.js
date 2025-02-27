@@ -1,6 +1,9 @@
 const dbPool = require("../Database/createPool");
 const { v4: uuidv4 } = require("uuid");
 
+const cryptoRandomString = require('crypto-random-string');
+
+
 const response = {
     code: 503, 
     body: { 
@@ -28,11 +31,12 @@ const manageAssignmentsModel = {
     },
 
     create: async (...params) => {
-        const joinCode = uuidv4().substring(0, 6);
+        const joinCode = cryptoRandomString({ length: 6, type: 'alphanumeric' });
+        
 
         const query = `
-        INSERT INTO assignments (userID, title, description, startDate, endDate, difficulty, filename, originalFilename, filePath, fileType, fileSize, isZip, join_code, join_code_expires_at)
-        VALUES ($1, $2, $3, $4, $5, $6, COALESCE($7, 'no_file'), COALESCE($8, 'no_file'), COALESCE($9, ''), COALESCE($10, 'unknown'), COALESCE($11, 0), COALESCE($12, FALSE), $13, NOW() + INTERVAL '7 day')
+        INSERT INTO assignments (userID, title, description, startDate, endDate, difficulty, filename, originalFilename, filePath, fileType, fileSize, isZip, join_code)
+        VALUES ($1, $2, $3, $4, $5, $6, COALESCE($7, 'no_file'), COALESCE($8, 'no_file'), COALESCE($9, ''), COALESCE($10, 'unknown'), COALESCE($11, 0), COALESCE($12, FALSE), $13)
         RETURNING *;`;
 
         try {
@@ -176,19 +180,26 @@ const manageAssignmentsModel = {
     joinAssignment: async (joinCode, userID) => {
         try {
             const result = await dbPool.query(
-                "SELECT * FROM assignments WHERE join_code = $1 AND (join_code_expires_at > NOW() OR join_code_expires_at IS NULL)", 
+                `
+                SELECT * 
+                FROM assignments 
+                WHERE join_code = $1;
+                `, 
                 [joinCode]);
 
             if (result.rows.length === 0) {
                 response.code = 404;
-                response.body.message = "Invalid or expired join code"
+                response.body.message = "Invalid join code"
                 return response;
             }
 
             const assignmentid = result.rows[0].assignmentid;
 
             const existingEntry = await dbPool.query(
-                "SELECT * FROM assignmentsinfo WHERE assignmentID = $1 AND userID = $2", 
+                `SELECT * 
+                FROM assignmentsinfo 
+                WHERE assignmentID = $1 AND userID = $2;
+                `, 
                 [assignmentid, userID]
             );
 
@@ -200,14 +211,18 @@ const manageAssignmentsModel = {
 
             const joinResult = await dbPool.query(
                 "INSERT INTO assignmentsinfo (assignmentID, userID, status) VALUES ($1, $2, $3) RETURNING *",
-                [assignmentid, userID, "IN_PROGRESS"]
+                [assignmentid, userID, 'IN_PROGRESS']
             );
 
+            const assignmentinfoid = joinResult.rows[0].assignmentinfoid;
+            await dbPool.query(
+                `
+                INSERT INTO submissions (assignmentInfoID)
+                VALUES ($1);
+                `, [assignmentinfoid])
+
             response.code = 200;
-            response.body.message = `Successfully joined assignment
-            Assignment ID: ${assignmentid}
-            User ID: ${userID}
-            Status: ${joinResult.rows[0].status}`;
+            response.body.message = `Successfully joined assignment\nAssignment ID: ${assignmentid}\nUser ID: ${userID}\nStatus: ${joinResult.rows[0].status}`;
 
         } catch (error) {
             response.code = 500;
