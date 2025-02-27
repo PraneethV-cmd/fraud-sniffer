@@ -16,12 +16,20 @@ export default function CreateAssignmentForm() {
   const [showPopup, setShowPopup] = useState(false);
   const [confirmCreateAssignment, setConfirmCreateAssignment] = useState(false);
   const fileInputRef = useRef(null);
-  
 
   const handleFileChange = (event) => {
     const newFiles = Array.from(event.target.files);
     setFiles((prevFiles) => [...prevFiles, ...newFiles]);
-    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleDrop = (event) => {
+    event.preventDefault();
+    const newFiles = Array.from(event.dataTransfer.files);
+    setFiles((prevFiles) => [...prevFiles, ...newFiles]);
+  };
+
+  const handleDragOver = (event) => {
+    event.preventDefault();
   };
 
   const handleFileDelete = (index) => {
@@ -43,7 +51,7 @@ export default function CreateAssignmentForm() {
   }
 
   const handleSubmit = async () => {
-    setConfirmCreateAssignment(false); // Close confirmation dialog
+    setConfirmCreateAssignment(false);
     setLoading(true);
 
     let fileToUpload = files.length > 1 ? await zipFiles() : files.length === 1 ? files[0] : null;
@@ -81,8 +89,8 @@ export default function CreateAssignmentForm() {
   };
 
   return (
-    <Box component="form" sx={{ mt: 4, maxHeight: '80vh', overflow: 'auto' }}>
-      <Typography variant="h6" gutterBottom>
+    <Box component="form" sx={{ mt: 4, p: 3, maxWidth: 600, mx: "auto", bgcolor: "background.paper", borderRadius: 2, boxShadow: 3, fontFamily: "Roboto" }}>
+      <Typography variant="h5" fontWeight="bold" gutterBottom textAlign="center">
         Create New Assignment
       </Typography>
       <TextField label="Assignment Title" fullWidth value={title} onChange={(e) => setTitle(e.target.value)} sx={{ mb: 2 }} />
@@ -95,7 +103,22 @@ export default function CreateAssignmentForm() {
       <TextField label="Start Date" type="datetime-local" fullWidth InputLabelProps={{ shrink: true }} value={startDate} onChange={(e) => setStartDate(e.target.value)} sx={{ mb: 2 }} />
       <TextField label="Due Date" type="datetime-local" fullWidth InputLabelProps={{ shrink: true }} value={dueDate} onChange={(e) => setDueDate(e.target.value)} sx={{ mb: 2 }} />
       
-      <TextField type="file" inputProps={{ multiple: true }} fullWidth onChange={handleFileChange} inputRef={fileInputRef} sx={{ mb: 2 }} />
+      <Box
+        onClick={() => fileInputRef.current.click()}
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        sx={{ border: "2px dashed gray", p: 3, textAlign: "center", cursor: "pointer", mb: 2 }}
+      >
+        <Typography>Click to add files or drag and drop here</Typography>
+        <input
+          type="file"
+          multiple
+          hidden
+          ref={fileInputRef}
+          onChange={handleFileChange}
+        />
+      </Box>
+      
       {files.length > 0 && (
         <Box sx={{ maxHeight: "150px", overflow: "auto", mb: 2 }}>
           {files.map((file, index) => (
@@ -113,33 +136,10 @@ export default function CreateAssignmentForm() {
         fullWidth 
         onClick={() => setConfirmCreateAssignment(true)} 
         disabled={loading}
-        sx={{ mb: 2 }}
+        sx={{ mb: 2, py: 1.5, fontSize: "1rem" }}
       >
         {loading ? <CircularProgress size={24} color="inherit" /> : "Submit Assignment"}
       </Button>
-
-      {/* Confirmation Dialog */}
-      <Dialog open={confirmCreateAssignment} onClose={() => setConfirmCreateAssignment(false)}>
-        <DialogTitle>Confirm Submission</DialogTitle>
-        <DialogContent>
-          <Typography>Are you sure you want to submit this assignment?</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setConfirmCreateAssignment(false)} color="secondary">Cancel</Button>
-          <Button onClick={handleSubmit} color="primary">Confirm</Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Popup for Response Message */}
-      <Dialog open={showPopup} onClose={() => setShowPopup(false)}>
-        <DialogTitle>Submission Status</DialogTitle>
-        <DialogContent>
-          <Typography>{popupMessage}</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setShowPopup(false)} color="primary">Close</Button>
-        </DialogActions>
-      </Dialog>
     </Box>
   );
 }

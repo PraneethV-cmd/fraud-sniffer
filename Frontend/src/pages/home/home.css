@@ -13,11 +13,13 @@
 }
 
 .sidebar {
-    background: #EEE2DC;
-    color: #e0e8a3;
-    min-height: 100vh;
-    padding-top: 2rem;
+  background: rgba(238, 226, 220, 0.3); /* Semi-transparent */
+  backdrop-filter: blur(10px); /* Blurry glass effect */
+  color: #e0e8a3;
+  min-height: 100vh;
+  padding-top: 2rem;
 }
+
 
 .main {
     flex-grow: 1;
