@@ -7,9 +7,17 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBars } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faHome, faTasks, faClipboardCheck, faBell, faUser } from "@fortawesome/free-solid-svg-icons";
 
-export default function TemporaryDrawer() {
+const menuItems = [
+  { text: "Home", icon: faHome },
+  { text: "Assignments", icon: faTasks },
+  { text: "Plagiarism Check", icon: faClipboardCheck },
+  { text: "Notifications", icon: faBell },
+  { text: "Profile", icon: faUser }
+];
+
+export default function CustomDrawer() {
   const [open, setOpen] = useState(false);
   
   const toggleDrawer = (newOpen) => () => {
@@ -17,11 +25,29 @@ export default function TemporaryDrawer() {
   };
 
   const DrawerList = (
-    <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)}>
+    <Box
+      sx={{
+        width: 260,
+        backgroundColor: "#1e1e2d",
+        height: "100vh",
+        color: "#fff",
+        paddingTop: "20px",
+        boxShadow: "2px 0 5px rgba(0,0,0,0.2)"
+      }}
+      role="presentation"
+      onClick={toggleDrawer(false)}
+    >
       <List>
-        {["Home", "Assignments", "Plagiarism Check", "Notifications", "Profile"].map((text) => (
+        {menuItems.map(({ text, icon }) => (
           <ListItem key={text} disablePadding>
-            <ListItemButton>
+            <ListItemButton
+              sx={{
+                color: "#fff",
+                '&:hover': { backgroundColor: "#2a2a3d" },
+                padding: "12px 20px"
+              }}
+            >
+              <FontAwesomeIcon icon={icon} style={{ marginRight: 15 }} />
               <ListItemText primary={text} />
             </ListItemButton>
           </ListItem>
@@ -32,10 +58,10 @@ export default function TemporaryDrawer() {
 
   return (
     <div>
-      <Button onClick={toggleDrawer(true)}>
+      <Button onClick={toggleDrawer(true)} sx={{ color: "#fff", fontSize: "20px" }}>
         <FontAwesomeIcon icon={faBars} />
       </Button>
-      <Drawer open={open} onClose={toggleDrawer(false)}>
+      <Drawer anchor="left" open={open} onClose={toggleDrawer(false)}>
         {DrawerList}
       </Drawer>
     </div>

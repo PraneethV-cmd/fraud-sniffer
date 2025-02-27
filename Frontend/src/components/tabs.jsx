@@ -114,61 +114,122 @@ export default function ColorTabs() {
         }}
       >
         <Tab
-          value="View Assignments"
-          label={<span>📚 View Assignments</span>}
-          sx={{
-            fontWeight: "bold",
-            color: "#1976D2",
-            textTransform: "none",
-            transition: "transform 0.3s, color 0.3s, letter-spacing 0.4s",
-            "&:hover": {
-              color: "#004ba0",
-              letterSpacing: "4px",
-            },
-          }}
-        />
-        <Tab
-          value="Manage Assignments"
-          label={<span>📔 Manage Assignments</span>}
-          sx={{
-            fontWeight: "bold",
-            color: "#1976D2",
-            textTransform: "none",
-            transition: "transform 0.3s, color 0.3s, letter-spacing 0.4s",
-            "&:hover": {
-              color: "#004ba0",
-              letterSpacing: "4px",
-            },
-          }}
-        />
-        <Tab
-          value="Create Assignments"
-          label={<span>✍️ Create Assignments</span>}
-          sx={{
-            fontWeight: "bold",
-            color: "#1976D2",
-            textTransform: "none",
-            transition: "transform 0.3s, color 0.3s, letter-spacing 0.4s",
-            "&:hover": {
-              color: "#004ba0",
-              letterSpacing: "4px",
-            },
-          }}
-        />
-        <Tab
-          value="Check Plagiarism"
-          label={<span>🔍 Check Plagiarism</span>}
-          sx={{
-            fontWeight: "bold",
-            color: "#1976D2",
-            textTransform: "none",
-            transition: "transform 0.3s, color 0.3s, letter-spacing 0.4s",
-            "&:hover": {
-              color: "#004ba0",
-              letterSpacing: "4px",
-            },
-          }}
-        />
+  value="View Assignments"
+  label={<span>📚 <b>View Assignments</b></span>}
+  sx={{
+    marginRight: "20px",
+    fontWeight: "bold",
+    fontSize: "1rem",
+    color: "#000000", // Black text color
+    textTransform: "none",
+    transition: "all 0.3s ease-in-out",
+    letterSpacing: "0.5px",
+    padding: "10px 20px",
+    borderRadius: "8px",
+    background: "linear-gradient(45deg, #FFEB3B, #FFC107)", // Yellow-orange gradient
+    "&:hover": {
+      background: "linear-gradient(45deg, #FF9800, #FF5722)", // Orange-red gradient on hover
+      color: "#000000", // Keep text black on hover
+      transform: "scale(1.05)",
+      letterSpacing: "1px",
+      boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)",
+    },
+    "&.Mui-selected": {
+      background: "linear-gradient(45deg, #8E24AA, #5E35B1)", // Purple-blue gradient when selected
+      color: "#000000", // Keep text black when selected
+      boxShadow: "0 4px 10px rgba(0, 0, 0, 0.3)",
+    },
+  }}
+/>
+
+<Tab
+  value="Manage Assignments"
+  label={<span>📔<b>Manage Assignments</b></span>}
+  sx={{
+    marginRight: "20px",
+    fontWeight: "bold",
+    fontSize: "1rem",
+    color: "#000000", // Black text color
+    textTransform: "none",
+    transition: "all 0.3s ease-in-out",
+    letterSpacing: "0.5px",
+    padding: "10px 20px",
+    borderRadius: "8px",
+    background: "linear-gradient(45deg, #FFEB3B, #FFC107)", // Yellow-orange gradient
+    "&:hover": {
+      background: "linear-gradient(45deg, #FF9800, #FF5722)", // Orange-red gradient on hover
+      color: "#000000", // Keep text black on hover
+      transform: "scale(1.05)",
+      letterSpacing: "1px",
+      boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)",
+    },
+    "&.Mui-selected": {
+      background: "linear-gradient(45deg, #8E24AA, #5E35B1)", // Purple-blue gradient when selected
+      color: "#000000", // Keep text black when selected
+      boxShadow: "0 4px 10px rgba(0, 0, 0, 0.3)",
+    },
+  }}
+/>
+
+<Tab
+  value="Create Assignments"
+  label={<span>✍️<b>Create Assignments</b></span>}
+  sx={{
+    marginRight: "20px",
+    fontWeight: "bold",
+    fontSize: "1rem",
+    color: "#000000", // Black text color
+    textTransform: "none",
+    transition: "all 0.3s ease-in-out",
+    letterSpacing: "0.5px",
+    padding: "10px 20px",
+    borderRadius: "8px",
+    background: "linear-gradient(45deg, #FFEB3B, #FFC107)", // Yellow-orange gradient
+    "&:hover": {
+      background: "linear-gradient(45deg, #FF9800, #FF5722)", // Orange-red gradient on hover
+      color: "#000000", // Keep text black on hover
+      transform: "scale(1.05)",
+      letterSpacing: "1px",
+      boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)",
+    },
+    "&.Mui-selected": {
+      background: "linear-gradient(45deg, #8E24AA, #5E35B1)", // Purple-blue gradient when selected
+      color: "#000000", // Keep text black when selected
+      boxShadow: "0 4px 10px rgba(0, 0, 0, 0.3)",
+    },
+  }}
+/>
+
+<Tab
+  value="Check Plagiarism"
+  label={<span>🔍<b>Check Plagiarism</b></span>}
+  sx={{
+    marginRight: "20px",
+    fontWeight: "bold",
+    fontSize: "1rem",
+    color: "#000000", // Black text color
+    textTransform: "none",
+    transition: "all 0.3s ease-in-out",
+    letterSpacing: "0.5px",
+    padding: "10px 20px",
+    borderRadius: "8px",
+    background: "linear-gradient(45deg, #FFEB3B, #FFC107)", // Yellow-orange gradient
+    "&:hover": {
+      background: "linear-gradient(45deg, #FF9800, #FF5722)", // Orange-red gradient on hover
+      color: "#000000", // Keep text black on hover
+      transform: "scale(1.05)",
+      letterSpacing: "1px",
+      boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)",
+    },
+    "&.Mui-selected": {
+      background: "linear-gradient(45deg, #8E24AA, #5E35B1)", // Purple-blue gradient when selected
+      color: "#000000", // Keep text black when selected
+      boxShadow: "0 4px 10px rgba(0, 0, 0, 0.3)",
+    },
+  }}
+/>
+        
+       
 
         <AutohideSnackbar 
           message={snackbarMessage} 

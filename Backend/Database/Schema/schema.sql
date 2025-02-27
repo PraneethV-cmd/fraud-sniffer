@@ -28,7 +28,7 @@ CREATE TABLE assignments (
   filename TEXT NOT NULL DEFAULT 'no_file',
   originalFilename TEXT NOT NULL DEFAULT 'no_file',
   filePath TEXT NOT NULL DEFAULT '',
-  fileType VARCHAR(50) NOT NULL DEFAULT 'unknown',
+  fileType VARCHAR(255) NOT NULL DEFAULT 'unknown',
   fileSize BIGINT NOT NULL DEFAULT 0,
   isZip BOOLEAN DEFAULT FALSE,
   uploadDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
