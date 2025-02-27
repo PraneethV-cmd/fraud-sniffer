@@ -145,6 +145,7 @@ const manageAssignmentsModel = {
                     FROM assignmentsinfo ai
                     INNER JOIN users u ON ai.userID = u.userID
                     INNER JOIN assignments a ON ai.assignmentID = a.assignmentID
+                    INNER JOIN submissions s ON s.assignmentInfoID = ai.assignmentInfoID
                     WHERE u.userID = $1;`;
             } else if (type === "owner") {
                 query = `

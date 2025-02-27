@@ -43,7 +43,14 @@ CREATE TABLE assignmentsinfo (
 CREATE TABLE submissions (
   submissionID SERIAL PRIMARY KEY,
   assignmentInfoID INT NOT NULL,
+  filename TEXT NOT NULL DEFAULT 'no_file',
+  originalFilename TEXT NOT NULL DEFAULT 'no_file',
+  filePath TEXT NOT NULL DEFAULT '',
+  fileType VARCHAR(50) NOT NULL DEFAULT 'unknown',
+  fileSize BIGINT NOT NULL DEFAULT 0,
+  isZip BOOLEAN DEFAULT FALSE,
   submissionDate TIMESTAMP NOT NULL,
+  status VARCHAR(255) NOT NULL DEFAULT 'Pending',
   FOREIGN KEY (assignmentInfoID) REFERENCES assignmentsinfo(assignmentInfoID) ON DELETE CASCADE
 );
 
