@@ -39,6 +39,8 @@ router.post("/create", upload.single("assignment"), async (req, res) => {
 router.post("/:assignmentID/upload", upload.single("assignment"), manageAssignmentsController.uploadFile);
 // router.get("/view/:id", manageAssignmentsController.downloadFile); - Created an alternative route download/filename
 
+router.post("/join", manageAssignmentsController.joinAssignment);
+
 module.exports = router;
 
 

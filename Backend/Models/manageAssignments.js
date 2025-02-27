@@ -1,4 +1,5 @@
 const dbPool = require("../Database/createPool");
+const { v4: uuidv4 } = require("uuid");
 
 const response = {
     code: 503, 
@@ -9,7 +10,6 @@ const response = {
 
 const manageAssignmentsModel = {
     get: async (assignmentID) => {
-
         const query = `SELECT * FROM assignments WHERE assignmentID = $1;`;
 
         try {
@@ -28,15 +28,19 @@ const manageAssignmentsModel = {
     },
 
     create: async (...params) => {
+        const joinCode = uuidv4().substring(0, 6);
+
         const query = `
-        INSERT INTO assignments (userID, title, description, startDate, endDate, difficulty, filename, originalFilename, filePath, fileType, fileSize, isZip)
-        VALUES ($1, $2, $3, $4, $5, $6, COALESCE($7, 'no_file'), COALESCE($8, 'no_file'), COALESCE($9, ''), COALESCE($10, 'unknown'), COALESCE($11, 0), COALESCE($12, FALSE))
+        INSERT INTO assignments (userID, title, description, startDate, endDate, difficulty, filename, originalFilename, filePath, fileType, fileSize, isZip, join_code, join_code_expires_at)
+        VALUES ($1, $2, $3, $4, $5, $6, COALESCE($7, 'no_file'), COALESCE($8, 'no_file'), COALESCE($9, ''), COALESCE($10, 'unknown'), COALESCE($11, 0), COALESCE($12, FALSE), $13, NOW() + INTERVAL '7 day')
         RETURNING *;`;
 
         try {
-            const results = await dbPool.query(query, params);
+            const paramsWithJoinCode = [...params, joinCode];
+            const results = await dbPool.query(query, paramsWithJoinCode);
             response.code = 201;
             response.body.message = results.rows[0];
+            console.log("[LOG] Assignment created with join code:", joinCode);
         } catch (error) {
             response.code = 500;
             response.body.message = error.message;
@@ -167,7 +171,52 @@ const manageAssignmentsModel = {
         }
 
         return response;
-    }
+    },
+
+    joinAssignment: async (joinCode, userID) => {
+        try {
+            const result = await dbPool.query(
+                "SELECT * FROM assignments WHERE join_code = $1 AND (join_code_expires_at > NOW() OR join_code_expires_at IS NULL)", 
+                [joinCode]);
+
+            if (result.rows.length === 0) {
+                response.code = 404;
+                response.body.message = "Invalid or expired join code"
+                return response;
+            }
+
+            const assignmentid = result.rows[0].assignmentid;
+
+            const existingEntry = await dbPool.query(
+                "SELECT * FROM assignmentsinfo WHERE assignmentID = $1 AND userID = $2", 
+                [assignmentid, userID]
+            );
+
+            if (existingEntry.rows.length > 0) {
+                response.code = 400;
+                response.body.message = "You have already joined this assignment";
+                return response;
+            }
+
+            const joinResult = await dbPool.query(
+                "INSERT INTO assignmentsinfo (assignmentID, userID, status) VALUES ($1, $2, $3) RETURNING *",
+                [assignmentid, userID, "IN_PROGRESS"]
+            );
+
+            response.code = 200;
+            response.body.message = `Successfully joined assignment
+            Assignment ID: ${assignmentid}
+            User ID: ${userID}
+            Status: ${joinResult.rows[0].status}`;
+
+        } catch (error) {
+            response.code = 500;
+            response.body.message = error.message;
+            console.error("[ERROR in manageAssignmentsModel.joinAssignment]:", error);
+        }
+
+        return response;
+    },
 };
 
 module.exports = manageAssignmentsModel;
