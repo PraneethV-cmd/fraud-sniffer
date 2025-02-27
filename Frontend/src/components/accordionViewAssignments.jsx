@@ -13,28 +13,43 @@ export default function ViewAssignmentsAccordion({ index, assignment }) {
 
   return (
     <div>
-      <Accordion key={index}>
+      <Accordion key={index} sx={{ backgroundColor: "#f5f5f5", boxShadow: 2, borderRadius: "8px" }}>
         <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
+          expandIcon={<ExpandMoreIcon sx={{ color: "#1976D2" }} />}
           aria-controls={`panel${index}-content`}
           id={`panel${index}-header`}
-          sx={{ display: "flex", justifyContent: "space-between", width: "100%" }}
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            width: "100%",
+            backgroundColor: "#e3f2fd",
+            borderBottom: "1px solid #ddd",
+            padding: "12px 16px",
+          }}
         >
-          <Typography component="span" sx={{ flexGrow: 1 }}>
+          <Typography component="span" sx={{ flexGrow: 1, fontWeight: "bold", fontSize: "1.1rem", color: "#333" }}>
             {assignment.title} (Difficulty: {assignment.difficulty})
           </Typography>
         </AccordionSummary>
 
-        <AccordionDetails>
-          <Typography>Description: {assignment.description}</Typography>
-          <Typography>Status: {assignment.status}</Typography>
-          <Typography>Start Date: {new Date(assignment.startdate).toLocaleString()}</Typography>
-          <Typography>End Date: {new Date(assignment.enddate).toLocaleString()}</Typography>
+        <AccordionDetails sx={{ padding: "16px", backgroundColor: "#fff" }}>
+          <Typography sx={{ fontSize: "1rem", color: "#444", marginBottom: "8px" }}>
+            <strong>Description:</strong> {assignment.description}
+          </Typography>
+          <Typography sx={{ fontSize: "1rem", color: "#444", marginBottom: "8px" }}>
+            <strong>Status:</strong> {assignment.status}
+          </Typography>
+          <Typography sx={{ fontSize: "1rem", color: "#444", marginBottom: "8px" }}>
+            <strong>Start Date:</strong> {new Date(assignment.startdate).toLocaleString()}
+          </Typography>
+          <Typography sx={{ fontSize: "1rem", color: "#444", marginBottom: "8px" }}>
+            <strong>End Date:</strong> {new Date(assignment.enddate).toLocaleString()}
+          </Typography>
 
           {/* File Download Section */}
           {assignment.filepath && assignment.filepath !== "" && assignment.filepath !== "no_file" && (
-            <Typography variant="body2" sx={{ marginTop: "8px" }}>
-              📄 Resource:{" "}
+            <Typography variant="body2" sx={{ marginTop: "8px", fontSize: "0.95rem", color: "#1976D2", fontWeight: "bold" }}>
+              📄 Resource: {" "}
               <a
                 href={`http://localhost:8080/api/download/${assignment.filename}`}
                 target="_blank"
@@ -48,8 +63,8 @@ export default function ViewAssignmentsAccordion({ index, assignment }) {
         </AccordionDetails>
 
         {/* Submit Assignment Button */}
-        <Box sx={{ display: "flex", padding: "1rem", gap: 1, justifyContent: "flex-end" }}>
-          <Button variant="outlined" size="small" color="primary" onClick={() => setOpen(true)}>
+        <Box sx={{ display: "flex", padding: "1rem", gap: 1, justifyContent: "flex-end", backgroundColor: "#e3f2fd", borderTop: "1px solid #ddd" }}>
+          <Button variant="contained" size="small" sx={{ backgroundColor: "#1976D2", color: "#fff" }} onClick={() => setOpen(true)}>
             Submit Assignment
           </Button>
         </Box>

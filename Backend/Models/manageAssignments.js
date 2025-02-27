@@ -1,7 +1,7 @@
 const dbPool = require("../Database/createPool");
 const { v4: uuidv4 } = require("uuid");
 
-const cryptoRandomString = require('crypto-random-string');
+const cryptoRandomString = require('crypto-random-string').default;
 
 
 const response = {
