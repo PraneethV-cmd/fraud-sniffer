@@ -20,16 +20,7 @@ export default function CreateAssignmentForm() {
   const handleFileChange = (event) => {
     const newFiles = Array.from(event.target.files);
     setFiles((prevFiles) => [...prevFiles, ...newFiles]);
-  };
-
-  const handleDrop = (event) => {
-    event.preventDefault();
-    const newFiles = Array.from(event.dataTransfer.files);
-    setFiles((prevFiles) => [...prevFiles, ...newFiles]);
-  };
-
-  const handleDragOver = (event) => {
-    event.preventDefault();
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const handleFileDelete = (index) => {
@@ -103,22 +94,7 @@ export default function CreateAssignmentForm() {
       <TextField label="Start Date" type="datetime-local" fullWidth InputLabelProps={{ shrink: true }} value={startDate} onChange={(e) => setStartDate(e.target.value)} sx={{ mb: 2 }} />
       <TextField label="Due Date" type="datetime-local" fullWidth InputLabelProps={{ shrink: true }} value={dueDate} onChange={(e) => setDueDate(e.target.value)} sx={{ mb: 2 }} />
       
-      <Box
-        onClick={() => fileInputRef.current.click()}
-        onDrop={handleDrop}
-        onDragOver={handleDragOver}
-        sx={{ border: "2px dashed gray", p: 3, textAlign: "center", cursor: "pointer", mb: 2 }}
-      >
-        <Typography>Click to add files or drag and drop here</Typography>
-        <input
-          type="file"
-          multiple
-          hidden
-          ref={fileInputRef}
-          onChange={handleFileChange}
-        />
-      </Box>
-      
+      <TextField type="file" inputProps={{ multiple: true }} fullWidth onChange={handleFileChange} inputRef={fileInputRef} sx={{ mb: 2 }} />
       {files.length > 0 && (
         <Box sx={{ maxHeight: "150px", overflow: "auto", mb: 2 }}>
           {files.map((file, index) => (
@@ -140,6 +116,27 @@ export default function CreateAssignmentForm() {
       >
         {loading ? <CircularProgress size={24} color="inherit" /> : "Submit Assignment"}
       </Button>
+
+      <Dialog open={confirmCreateAssignment} onClose={() => setConfirmCreateAssignment(false)}>
+        <DialogTitle>Confirm Submission</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to submit this assignment?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmCreateAssignment(false)} color="secondary">Cancel</Button>
+          <Button onClick={handleSubmit} color="primary">Confirm</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={showPopup} onClose={() => setShowPopup(false)}>
+        <DialogTitle>Submission Status</DialogTitle>
+        <DialogContent>
+          <Typography>{popupMessage}</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowPopup(false)} color="primary">Close</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
