@@ -17,8 +17,8 @@ CREATE TABLE assignments (
   userID INT NOT NULL,
   title VARCHAR(255) NOT NULL,
   description TEXT NOT NULL,
-  startDate DATE NOT NULL,
-  endDate DATE NOT NULL,
+  startDate TIMESTAMP NOT NULL,
+  endDate TIMESTAMP NOT NULL,
   difficulty VARCHAR(255) NOT NULL,
   status VARCHAR(255) NOT NULL DEFAULT 'ACTIVE',
   filename TEXT NOT NULL DEFAULT 'no_file',
@@ -43,7 +43,7 @@ CREATE TABLE assignmentsinfo (
 CREATE TABLE submissions (
   submissionID SERIAL PRIMARY KEY,
   assignmentInfoID INT NOT NULL,
-  submissionDate DATE NOT NULL,
+  submissionDate TIMESTAMP NOT NULL,
   FOREIGN KEY (assignmentInfoID) REFERENCES assignmentsinfo(assignmentInfoID) ON DELETE CASCADE
 );
 

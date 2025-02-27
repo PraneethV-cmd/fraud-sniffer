@@ -1,10 +1,8 @@
 import React, { useState, useRef } from "react";
-import { Box, Button, TextField, Typography, MenuItem, List, ListItem, ListItemText, IconButton, FormControl, FormLabel, Tooltip, Link } from "@mui/material";
-import DeleteIcon from '@mui/icons-material/Delete';
+import { Box, Button, TextField, Typography, MenuItem, Dialog, DialogActions, DialogContent, DialogTitle, CircularProgress } from "@mui/material";
 import JSZip from "jszip";
-import styled from 'styled-components';
 
-const difficulties = ["Easy", "Medium", "Hard"]; // Difficulty levels
+const difficulties = ["Easy", "Medium", "Hard"];
 
 export default function CreateAssignmentForm() {
   const [title, setTitle] = useState("");
@@ -13,181 +11,134 @@ export default function CreateAssignmentForm() {
   const [dueDate, setDueDate] = useState("");
   const [difficulty, setDifficulty] = useState("");
   const [files, setFiles] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
+  const [showPopup, setShowPopup] = useState(false);
+  const [confirmCreateAssignment, setConfirmCreateAssignment] = useState(false);
   const fileInputRef = useRef(null);
 
   const handleFileChange = (event) => {
     const newFiles = Array.from(event.target.files);
     setFiles((prevFiles) => [...prevFiles, ...newFiles]);
-
-    // Reset file input value
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const handleFileDelete = (index) => {
-    const updatedFiles = files.filter((_, i) => i !== index);
-    setFiles(updatedFiles);
+    setFiles(files.filter((_, i) => i !== index));
   };
 
   const zipFiles = async () => {
     const zip = new JSZip();
-
-    // Add each file to the zip archive
-    files.forEach((file) => {
-      zip.file(file.name, file);
-    });
-
-    // Generate the zip file as a Blob
+    files.forEach((file) => zip.file(file.name, file));
     const blob = await zip.generateAsync({ type: "blob" });
-
-    // Convert Blob to File object
-    const zipFile = new File([blob], "assignment_files.zip", { type: "application/zip" });
-
-    return zipFile;
+    return new File([blob], "assignment_files.zip", { type: "application/zip" });
   };
 
-  function getStatus(startDate, endDate){
+  function getStatus(startDate, endDate) {
     const today = new Date();
-    if(today < startDate) return "NOT STARTED";
-    if(today > endDate) return "COMPLETED";
+    if (today < new Date(startDate)) return "NOT STARTED";
+    if (today > new Date(endDate)) return "COMPLETED";
     return "ACTIVE";
   }
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const handleSubmit = async () => {
+    setConfirmCreateAssignment(false); // Close confirmation dialog
+    setLoading(true);
 
-    let fileToUpload;
-    if (files.length > 1) {
-        fileToUpload = await zipFiles(); // Zip all files
-    } else if(files.length == 1) {
-        fileToUpload = files[0]; // Single file upload
-    }
-
-    // Create FormData object
+    let fileToUpload = files.length > 1 ? await zipFiles() : files.length === 1 ? files[0] : null;
     const formData = new FormData();
-    if(files.length >= 1) formData.append("assignment", fileToUpload); // File
+    if (fileToUpload) formData.append("assignment", fileToUpload);
     formData.append("otherfields", JSON.stringify({
-        userID: 2,
-        title: title,
-        description: description,
-        startDate: startDate,
-        endDate: dueDate,
-        difficulty: difficulty,
-        status: getStatus(startDate, dueDate)
-    })); // Convert object to JSON string
+      userID: 2,
+      title,
+      description,
+      startDate,
+      endDate: dueDate,
+      difficulty,
+      status: getStatus(startDate, dueDate),
+    }));
 
     try {
-        const response = await fetch("http://localhost:8080/api/assignment/create", {
-            method: "POST",
-            body: formData, // FormData instead of raw JSON
-        });
+      const response = await fetch("http://localhost:8080/api/assignment/create", {
+        method: "POST",
+        body: formData,
+      });
 
-        if (response.ok) {
-            alert("Assignment uploaded successfully!");
-            setFiles([]);
-        } else {
-            alert("Error uploading assignment");
-        }
+      if (response.ok) {
+        setPopupMessage("✅ Assignment uploaded successfully!");
+        setFiles([]);
+      } else {
+        setPopupMessage("❌ Error uploading assignment.");
+      }
     } catch (error) {
-        console.error("Upload error:", error);
-        alert("Upload failed");
+      setPopupMessage("❌ Upload failed. Please try again.");
+      console.error("Upload error:", error);
+    } finally {
+      setLoading(false);
+      setShowPopup(true);
     }
   };
 
-
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 4, maxHeight: '80vh', overflow: 'auto' }} className="create-assignment-page">
+    <Box component="form" sx={{ mt: 4, maxHeight: '80vh', overflow: 'auto' }}>
       <Typography variant="h6" gutterBottom>
         Create New Assignment
       </Typography>
-      <TextField
-        label="Assignment Title"
-        fullWidth
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        sx={{ mb: 2 }}
-      />
-      <TextField
-        label="Description"
-        fullWidth
-        multiline
-        rows={4}
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        sx={{ mb: 2 }}
-      />
-      <TextField
-        select
-        label="Difficulty"
-        fullWidth
-        value={difficulty}
-        onChange={(e) => setDifficulty(e.target.value)}
-        sx={{ mb: 2 }}
-      >
+      <TextField label="Assignment Title" fullWidth value={title} onChange={(e) => setTitle(e.target.value)} sx={{ mb: 2 }} />
+      <TextField label="Description" fullWidth multiline rows={4} value={description} onChange={(e) => setDescription(e.target.value)} sx={{ mb: 2 }} />
+      <TextField select label="Difficulty" fullWidth value={difficulty} onChange={(e) => setDifficulty(e.target.value)} sx={{ mb: 2 }}>
         {difficulties.map((level) => (
-          <MenuItem key={level} value={level}>
-            {level}
-          </MenuItem>
+          <MenuItem key={level} value={level}>{level}</MenuItem>
         ))}
       </TextField>
-      <FormControl fullWidth sx={{ mb: 2 }}>
-        <FormLabel>Assignment Files</FormLabel>
-        <TextField
-          type="file"
-          inputProps={{ multiple: true }}
-          onChange={handleFileChange}
-          inputRef={fileInputRef}
-        />
-      </FormControl>
-      <Box sx={{ maxHeight: '200px', overflow: 'auto', mb: 2 }}>
-        <List>
+      <TextField label="Start Date" type="datetime-local" fullWidth InputLabelProps={{ shrink: true }} value={startDate} onChange={(e) => setStartDate(e.target.value)} sx={{ mb: 2 }} />
+      <TextField label="Due Date" type="datetime-local" fullWidth InputLabelProps={{ shrink: true }} value={dueDate} onChange={(e) => setDueDate(e.target.value)} sx={{ mb: 2 }} />
+      
+      <TextField type="file" inputProps={{ multiple: true }} fullWidth onChange={handleFileChange} inputRef={fileInputRef} sx={{ mb: 2 }} />
+      {files.length > 0 && (
+        <Box sx={{ maxHeight: "150px", overflow: "auto", mb: 2 }}>
           {files.map((file, index) => (
-            <ListItem key={index} secondaryAction={
-              <IconButton edge="end" aria-label="delete" onClick={() => handleFileDelete(index)}>
-                <DeleteIcon />
-              </IconButton>
-            }>
-              <Tooltip title={URL.createObjectURL(file)} arrow>
-                <Link href={URL.createObjectURL(file)} target="_blank" rel="noopener noreferrer">
-                  <ListItemText primary={file.name} />
-                </Link>
-              </Tooltip>
-            </ListItem>
+            <Typography key={index} sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              {file.name}
+              <Button color="error" size="small" onClick={() => handleFileDelete(index)}>Remove</Button>
+            </Typography>
           ))}
-        </List>
-      </Box>
-      <TextField
-        label="Start Date"
-        type="date"
-        fullWidth
-        InputLabelProps={{ shrink: true }}
-        value={startDate}
-        onChange={(e) => setStartDate(e.target.value)}
+        </Box>
+      )}
+
+      <Button 
+        variant="contained" 
+        color="primary" 
+        fullWidth 
+        onClick={() => setConfirmCreateAssignment(true)} 
+        disabled={loading}
         sx={{ mb: 2 }}
-      />
-      <TextField
-        label="Due Date"
-        type="date"
-        fullWidth
-        InputLabelProps={{ shrink: true }}
-        value={dueDate}
-        onChange={(e) => setDueDate(e.target.value)}
-        sx={{ mb: 2 }}
-      />
-      <button className="btn">
-        <span>
-          Submit 
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><g strokeWidth={0} id="SVGRepo_bgCarrier" /><g strokeLinejoin="round" strokeLinecap="round" id="SVGRepo_tracerCarrier" /><g id="SVGRepo_iconCarrier"> <path fill="#ffffff" d="M20.33 3.66996C20.1408 3.48213 19.9035 3.35008 19.6442 3.28833C19.3849 3.22659 19.1135 3.23753 18.86 3.31996L4.23 8.19996C3.95867 8.28593 3.71891 8.45039 3.54099 8.67255C3.36307 8.89471 3.25498 9.16462 3.23037 9.44818C3.20576 9.73174 3.26573 10.0162 3.40271 10.2657C3.5397 10.5152 3.74754 10.7185 4 10.85L10.07 13.85L13.07 19.94C13.1906 20.1783 13.3751 20.3785 13.6029 20.518C13.8307 20.6575 14.0929 20.7309 14.36 20.73H14.46C14.7461 20.7089 15.0192 20.6023 15.2439 20.4239C15.4686 20.2456 15.6345 20.0038 15.72 19.73L20.67 5.13996C20.7584 4.88789 20.7734 4.6159 20.7132 4.35565C20.653 4.09541 20.5201 3.85762 20.33 3.66996ZM4.85 9.57996L17.62 5.31996L10.53 12.41L4.85 9.57996ZM14.43 19.15L11.59 13.47L18.68 6.37996L14.43 19.15Z" /> </g></svg>
-        </span>
-        <span>
-          Sure ?
-        </span>
-        <span>
-          Done ! 
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><g strokeWidth={0} id="SVGRepo_bgCarrier" /><g strokeLinejoin="round" strokeLinecap="round" id="SVGRepo_tracerCarrier" /><g id="SVGRepo_iconCarrier"> <path strokeLinecap="round" strokeWidth={2} stroke="#ffffff" d="M8.00011 13L12.2278 16.3821C12.6557 16.7245 13.2794 16.6586 13.6264 16.2345L22.0001 6" /> <path fill="#ffffff" d="M11.1892 12.2368L15.774 6.63327C16.1237 6.20582 16.0607 5.5758 15.6332 5.22607C15.2058 4.87635 14.5758 4.93935 14.226 5.36679L9.65273 10.9564L11.1892 12.2368ZM8.02292 16.1068L6.48641 14.8263L5.83309 15.6248L2.6 13.2C2.15817 12.8687 1.53137 12.9582 1.2 13.4C0.868627 13.8419 0.95817 14.4687 1.4 14.8L4.63309 17.2248C5.49047 17.8679 6.70234 17.7208 7.381 16.8913L8.02292 16.1068Z" clipRule="evenodd" fillRule="evenodd" /> </g></svg>
-        </span>
-      </button>
+      >
+        {loading ? <CircularProgress size={24} color="inherit" /> : "Submit Assignment"}
+      </Button>
+
+      {/* Confirmation Dialog */}
+      <Dialog open={confirmCreateAssignment} onClose={() => setConfirmCreateAssignment(false)}>
+        <DialogTitle>Confirm Submission</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to submit this assignment?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmCreateAssignment(false)} color="secondary">Cancel</Button>
+          <Button onClick={handleSubmit} color="primary">Confirm</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Popup for Response Message */}
+      <Dialog open={showPopup} onClose={() => setShowPopup(false)}>
+        <DialogTitle>Submission Status</DialogTitle>
+        <DialogContent>
+          <Typography>{popupMessage}</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowPopup(false)} color="primary">Close</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

@@ -17,14 +17,28 @@ import Input from "@mui/material/Input";
  * @param {Function} props.onSave - Function to save updated assignment
  */
 export function FormDialogEditAssignment({ open, onClose, assignment, onSave }) {
+  const formatDate = (isoString) => {
+    if (!isoString) return ""; // Handle empty values
+
+    const date = new Date(isoString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Ensure 2 digits
+    const day = String(date.getDate()).padStart(2, "0"); // Ensure 2 digits
+    const hours = String(date.getHours()).padStart(2, "0"); // Convert to 24-hour format
+    const minutes = String(date.getMinutes()).padStart(2, "0"); // Ensure 2 digits
+
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
+
+
   const [formData, setFormData] = React.useState({
     title: assignment?.title || "",
     description: assignment?.description || "",
     difficulty: assignment?.difficulty || "Medium",
-    status: assignment?.status || "Active",
-    startdate: assignment?.startdate || "",
-    enddate: assignment?.enddate || "",
+    startDate: formatDate(assignment?.startdate),
+    endDate: formatDate(assignment?.enddate),
   });
+
 
   // Handles form input changes
   const handleChange = (e) => {
@@ -34,6 +48,32 @@ export function FormDialogEditAssignment({ open, onClose, assignment, onSave }) 
   // Handles form submission
   const handleSubmit = (event) => {
     event.preventDefault();
+    try {
+      fetch(`http://localhost:8080/api/assignment/${assignment.assignmentID}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Assignment updated successfully", data);
+      })
+      .catch((error) => {
+        console.error("Error updating assignment:", error);
+      });
+
+
+
+    } catch (error) {
+      
+    }
     onSave(formData); // Calls the onSave function with updated data
     onClose(); // Closes the dialog
   };
@@ -86,27 +126,10 @@ export function FormDialogEditAssignment({ open, onClose, assignment, onSave }) 
           <TextField
             fullWidth
             margin="dense"
-            label="Status"
-            name="status"
-            select
-            value={formData.status}
-            onChange={handleChange}
-            required
-          >
-            {["Active", "Completed", "Pending"].map((option) => (
-              <MenuItem key={option} value={option}>
-                {option}
-              </MenuItem>
-            ))}
-          </TextField>
-
-          <TextField
-            fullWidth
-            margin="dense"
             label="Start Date"
-            name="startdate"
+            name="startDate"
             type="datetime-local"
-            value={formData.startdate}
+            value={formData.startDate}
             onChange={handleChange}
             required
           />
@@ -115,9 +138,9 @@ export function FormDialogEditAssignment({ open, onClose, assignment, onSave }) 
             fullWidth
             margin="dense"
             label="End Date"
-            name="enddate"
+            name="endDate"
             type="datetime-local"
-            value={formData.enddate}
+            value={formData.endDate}
             onChange={handleChange}
             required
           />
