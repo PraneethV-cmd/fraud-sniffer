@@ -51,12 +51,12 @@ CREATE TABLE assignmentsinfo (
 CREATE TABLE submissions (
   submissionID SERIAL PRIMARY KEY,
   assignmentInfoID INT NOT NULL,
-  filename TEXT NOT NULL DEFAULT 'no_file',
-  originalFilename TEXT NOT NULL DEFAULT 'no_file',
-  filePath TEXT NOT NULL DEFAULT '',
-  fileType VARCHAR(50) NOT NULL DEFAULT 'unknown',
-  fileSize BIGINT NOT NULL DEFAULT 0,
-  isZip BOOLEAN DEFAULT FALSE,
+  submissionFilename TEXT NOT NULL DEFAULT 'no_file',
+  submissionOriginalFilename TEXT NOT NULL DEFAULT 'no_file',
+  submissionFilePath TEXT NOT NULL DEFAULT '',
+  submissionFileType VARCHAR(50) NOT NULL DEFAULT 'unknown',
+  submissionFileSize BIGINT NOT NULL DEFAULT 0,
+  submissionIsZip BOOLEAN DEFAULT FALSE,
   submissionDate TIMESTAMP,
   submissionStatus VARCHAR(255) NOT NULL DEFAULT 'PENDING',
   FOREIGN KEY (assignmentInfoID) REFERENCES assignmentsinfo(assignmentInfoID) ON DELETE CASCADE

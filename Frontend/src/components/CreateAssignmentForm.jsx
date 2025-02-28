@@ -45,11 +45,13 @@ export default function CreateAssignmentForm() {
     setConfirmCreateAssignment(false);
     setLoading(true);
 
+    const userID = sessionStorage.getItem("userID");
+
     let fileToUpload = files.length > 1 ? await zipFiles() : files.length === 1 ? files[0] : null;
     const formData = new FormData();
     if (fileToUpload) formData.append("assignment", fileToUpload);
     formData.append("otherfields", JSON.stringify({
-      userID: 2,
+      userID: userID,
       title,
       description,
       startDate,
@@ -81,9 +83,9 @@ export default function CreateAssignmentForm() {
 
   return (
     <Box component="form" sx={{ mt: 4, p: 3, maxWidth: 600, mx: "auto", bgcolor: "background.paper", borderRadius: 2, boxShadow: 3, fontFamily: "Roboto" }}>
-      <Typography variant="h5" fontWeight="bold" gutterBottom textAlign="center">
+      {/* <Typography variant="h5" fontWeight="bold" gutterBottom textAlign="center">
         Create New Assignment
-      </Typography>
+      </Typography> */}
       <TextField label="Assignment Title" fullWidth value={title} onChange={(e) => setTitle(e.target.value)} sx={{ mb: 2 }} />
       <TextField label="Description" fullWidth multiline rows={4} value={description} onChange={(e) => setDescription(e.target.value)} sx={{ mb: 2 }} />
       <TextField select label="Difficulty" fullWidth value={difficulty} onChange={(e) => setDifficulty(e.target.value)} sx={{ mb: 2 }}>
@@ -91,10 +93,10 @@ export default function CreateAssignmentForm() {
           <MenuItem key={level} value={level}>{level}</MenuItem>
         ))}
       </TextField>
-      <TextField label="Start Date" type="datetime-local" fullWidth InputLabelProps={{ shrink: true }} value={startDate} onChange={(e) => setStartDate(e.target.value)} sx={{ mb: 2 }} />
-      <TextField label="Due Date" type="datetime-local" fullWidth InputLabelProps={{ shrink: true }} value={dueDate} onChange={(e) => setDueDate(e.target.value)} sx={{ mb: 2 }} />
+      <TextField label="Start Date" type="datetime-local"  InputLabelProps={{ shrink: true }} value={startDate} onChange={(e) => setStartDate(e.target.value)} sx={{ mb: 2 }} style={{padding : "0.5rem"}}/>
+      <TextField label="Due Date" type="datetime-local"  InputLabelProps={{ shrink: true }} value={dueDate} onChange={(e) => setDueDate(e.target.value)} sx={{ mb: 2 }} style={{padding : "0.5rem"}}/>
       
-      <TextField type="file" inputProps={{ multiple: true }} fullWidth onChange={handleFileChange} inputRef={fileInputRef} sx={{ mb: 2 }} />
+      <TextField type="file" inputProps={{ multiple: true }} onChange={handleFileChange} inputRef={fileInputRef} sx={{ mb: 2 }} />
       {files.length > 0 && (
         <Box sx={{ maxHeight: "150px", overflow: "auto", mb: 2 }}>
           {files.map((file, index) => (
@@ -114,13 +116,13 @@ export default function CreateAssignmentForm() {
         disabled={loading}
         sx={{ mb: 2, py: 1.5, fontSize: "1rem" }}
       >
-        {loading ? <CircularProgress size={24} color="inherit" /> : "Submit Assignment"}
+        {loading ? <CircularProgress size={24} color="inherit" /> : "Create Assignment"}
       </Button>
 
       <Dialog open={confirmCreateAssignment} onClose={() => setConfirmCreateAssignment(false)}>
         <DialogTitle>Confirm Submission</DialogTitle>
         <DialogContent>
-          <Typography>Are you sure you want to submit this assignment?</Typography>
+          <Typography>Are you sure you want to create this assignment?</Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setConfirmCreateAssignment(false)} color="secondary">Cancel</Button>
@@ -129,7 +131,7 @@ export default function CreateAssignmentForm() {
       </Dialog>
 
       <Dialog open={showPopup} onClose={() => setShowPopup(false)}>
-        <DialogTitle>Submission Status</DialogTitle>
+        <DialogTitle>Creation Status</DialogTitle>
         <DialogContent>
           <Typography>{popupMessage}</Typography>
         </DialogContent>

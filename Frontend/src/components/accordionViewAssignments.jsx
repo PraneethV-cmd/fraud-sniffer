@@ -77,7 +77,7 @@ export default function ViewAssignmentsAccordion({ index, assignment }) {
           </Typography>
 
           {/* File Download Section */}
-          {assignment.filepath && assignment.filepath !== "" && assignment.filepath !== "no_file" && (
+          {assignment.filepath && assignment.filepath !== "" && assignment.filename !== "no_file" && (
             <Typography
               variant="body2"
               sx={{
@@ -104,6 +104,45 @@ export default function ViewAssignmentsAccordion({ index, assignment }) {
               </a>
             </Typography>
           )}
+
+          {assignment.submissionfilepath && assignment.submissionfilepath !== "" && assignment.submissionfilename !== "no_file" && (
+            <Typography
+              variant="body2"
+              sx={{
+                marginTop: "8px",
+                fontSize: "0.95rem",
+                fontWeight: "bold",
+              }}
+            >
+              📄 Submitted :{" "}
+              <a
+                href={`http://localhost:8080/api/download/${assignment.submissionfilename}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  color: "#1976D2",
+                  fontWeight: "bold",
+                  textDecoration: "none",
+                  transition: "color 0.3s ease",
+                }}
+                onMouseOver={(e) => (e.target.style.color = "#0d47a1")}
+                onMouseOut={(e) => (e.target.style.color = "#1976D2")}
+              >
+                {assignment.submissionoriginalfilename || "Download File"}
+              </a> 
+              <span style={{ fontWeight: "0.005rem" }}>
+                {` at ${new Date(assignment.submissiondate).toLocaleString("en-US", {
+                  timeZoneName: "short"
+                }).split(' ')[0]} ${new Date(assignment.submissiondate).toLocaleString("en-US", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  second: "2-digit",
+                  hour12: true
+                })}`}
+              </span>
+
+            </Typography>
+          )}
         </AccordionDetails>
 
         {/* Submit Assignment Button */}
@@ -128,15 +167,15 @@ export default function ViewAssignmentsAccordion({ index, assignment }) {
               transition: "0.3s ease",
               "&:hover": { backgroundColor: "#0d47a1" },
             }}
-            onClick={() => setOpen(true)}
+            onClick={() => assignment.submissionstatus === "PENDING" && setOpen(true)}
           >
-            Submit Assignment
+            {assignment.submissionstatus === "PENDING" ? "Submit Assignment" : "Submitted"}
           </Button>
         </Box>
       </Accordion>
 
       {/* Upload Assignment Dialog */}
-      <FormDialogSubmitAssignment open={open} onClose={() => setOpen(false)} assignmentID={assignment.assignmentID} />
+      <FormDialogSubmitAssignment open={open} onClose={() => setOpen(false)} assignmentID={assignment.assignmentid} />
     </div>
   );
 }

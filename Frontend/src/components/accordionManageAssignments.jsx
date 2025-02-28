@@ -12,7 +12,9 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import { FormDialogEditAssignment } from "./formDialog"; // Import the updated dialog
 
-export default function AccordionUsage({ index, title, description, difficulty, status, startdate, enddate, assignmentID }) {
+export default function AccordionUsage({ assignment, index }) {
+  const { title, description, difficulty, status, startdate, enddate, assignmentID, filepath, filename, originalfilename } = assignment;
+
   const [open, setOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [assignmentData, setAssignmentData] = useState({
@@ -90,7 +92,7 @@ export default function AccordionUsage({ index, title, description, difficulty, 
           }}
         >
           <Typography component="span" sx={{ flexGrow: 1, fontSize: "1.2rem", fontWeight: 600 }}>
-            {assignmentData.title} #{index}
+            {assignmentData.title}
           </Typography>
         </AccordionSummary>
 
@@ -172,6 +174,35 @@ export default function AccordionUsage({ index, title, description, difficulty, 
   >
     {new Date(assignmentData.enddate).toLocaleString()}
   </Typography>
+
+  {/* File Download Section */}
+          {filepath && filepath !== "" && filename !== "no_file" && (
+            <Typography
+              variant="body2"
+              sx={{
+                marginTop: "8px",
+                fontSize: "0.95rem",
+                fontWeight: "bold",
+              }}
+            >
+              📄 Resource:{" "}
+              <a
+                href={`http://localhost:8080/api/download/${filename}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  color: "#1976D2",
+                  fontWeight: "bold",
+                  textDecoration: "none",
+                  transition: "color 0.3s ease",
+                }}
+                onMouseOver={(e) => (e.target.style.color = "#0d47a1")}
+                onMouseOut={(e) => (e.target.style.color = "#1976D2")}
+              >
+                {originalfilename || "Download File"}
+              </a>
+            </Typography>
+          )}
 </AccordionDetails>
 
 

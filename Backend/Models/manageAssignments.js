@@ -247,12 +247,12 @@ const manageAssignmentsModel = {
             const query = `
             UPDATE submissions
             SET 
-                filename = $2,
-                originalFilename = $3,
-                filePath = $4,
-                fileType = $5,
-                fileSize = $6,
-                isZip = $7,
+                submissionFilename = $2,
+                submissionOriginalFilename = $3,
+                submissionFilePath = $4,
+                submissionFileType = $5,
+                submissionFileSize = $6,
+                submissionIsZip = $7,
                 submissionDate = $8,
                 submissionStatus = $9
             WHERE assignmentInfoID = $1;

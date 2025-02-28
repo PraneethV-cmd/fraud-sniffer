@@ -124,7 +124,6 @@ export function FormDialogEditAssignment({ open, onClose, assignment, onSave }) 
           </TextField>
 
           <TextField
-            fullWidth
             margin="dense"
             label="Start Date"
             name="startDate"
@@ -132,10 +131,10 @@ export function FormDialogEditAssignment({ open, onClose, assignment, onSave }) 
             value={formData.startDate}
             onChange={handleChange}
             required
+            style={{padding:"0.05rem"}}
           />
 
           <TextField
-            fullWidth
             margin="dense"
             label="End Date"
             name="endDate"
@@ -143,6 +142,7 @@ export function FormDialogEditAssignment({ open, onClose, assignment, onSave }) 
             value={formData.endDate}
             onChange={handleChange}
             required
+            style={{padding:"0.05rem"}}
           />
 
           <DialogActions>
@@ -160,7 +160,6 @@ export function FormDialogEditAssignment({ open, onClose, assignment, onSave }) 
 
 export function FormDialogSubmitAssignment({ open, onClose, assignmentID }) {
   const [file, setFile] = React.useState(null);
-  const [comments, setComments] = React.useState("");
 
   const handleFileChange = (event) => {
     setFile(event.target.files[0]);
@@ -171,14 +170,15 @@ export function FormDialogSubmitAssignment({ open, onClose, assignmentID }) {
       alert("Please select a file to upload.");
       return;
     }
-
+    const userID = sessionStorage.getItem("userID");
     const formData = new FormData();
-    formData.append("assignmentID", assignmentID);
-    formData.append("file", file);
-    formData.append("comments", comments);
+    formData.append("otherfields", JSON.stringify({
+      "userID" : userID
+    }));
+    formData.append("assignment", file);
 
     try {
-      const response = await fetch("http://localhost:8080/api/submit-assignment", {
+      const response = await fetch(`http://localhost:8080/api/assignment/${assignmentID}/submit`, {
         method: "POST",
         body: formData,
       });
@@ -199,14 +199,6 @@ export function FormDialogSubmitAssignment({ open, onClose, assignmentID }) {
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>Submit Assignment</DialogTitle>
       <DialogContent>
-        <TextField
-          fullWidth
-          label="Comments (Optional)"
-          variant="outlined"
-          value={comments}
-          onChange={(e) => setComments(e.target.value)}
-          sx={{ marginBottom: 2 }}
-        />
         <Input type="file" onChange={handleFileChange} />
       </DialogContent>
       <DialogActions>
