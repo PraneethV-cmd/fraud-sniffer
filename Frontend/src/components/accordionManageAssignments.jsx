@@ -10,10 +10,11 @@ import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
-import { FormDialogEditAssignment } from "./formDialog"; // Import the updated dialog
+import ContentCopyIcon from "@mui/icons-material/ContentCopy"; // Copy icon
+import { FormDialogEditAssignment } from "./formDialog";
 
 export default function AccordionUsage({ assignment, index }) {
-  const { title, description, difficulty, status, startdate, enddate, assignmentID, filepath, filename, originalfilename } = assignment;
+  const { title, description, difficulty, status, startdate, enddate, assignmentID, filepath, filename, originalfilename, join_code } = assignment;
 
   const [open, setOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -25,6 +26,7 @@ export default function AccordionUsage({ assignment, index }) {
     status,
     startdate,
     enddate,
+    join_code,
   });
 
   // Handle edit button click
@@ -57,6 +59,12 @@ export default function AccordionUsage({ assignment, index }) {
       .catch((error) => console.error("Error deleting assignment:", error));
 
     setDeleteDialogOpen(false);
+  };
+
+  // Copy Join Code to clipboard
+  const handleCopyjoin_code = () => {
+    navigator.clipboard.writeText(assignmentData.join_code);
+    alert("Join Code copied: " + assignmentData.join_code);
   };
 
   return (
@@ -94,97 +102,42 @@ export default function AccordionUsage({ assignment, index }) {
           <Typography component="span" sx={{ flexGrow: 1, fontSize: "1.2rem", fontWeight: 600 }}>
             {assignmentData.title}
           </Typography>
+          <Typography
+              sx={{ fontWeight: "bold", color: "#1976D2", fontSize: "1rem", display: "flex", alignItems: "center" }}
+            >
+              🔑 Join Code:
+              <span style={{ marginLeft: "8px", fontFamily: "monospace", fontSize: "1rem" }}>
+                {assignmentData.join_code}
+              </span>
+          </Typography>
+          <Button
+              variant="contained"
+              size="small"
+              onClick={handleCopyjoin_code}
+              sx={{ backgroundColor: "#1976D2", color: "#fff", minWidth: "40px" }}
+            >
+              <ContentCopyIcon fontSize="small" />
+          </Button>
         </AccordionSummary>
 
         <AccordionDetails
-  sx={{
-    padding: "1rem",
-    background: "linear-gradient(to right, #f8f9fa, #e9ecef)",
-    borderRadius: "10px",
-    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-  }}
->
-  <Typography
-    variant="body1"
-    sx={{ fontWeight: "bold", color: "#333", fontSize: "1.1rem" }}
-  >
-    Description:
-  </Typography>
-  <Typography
-    variant="body2"
-    sx={{ color: "#555", paddingBottom: "0.5rem", fontSize: "1rem" }}
-  >
-    {assignmentData.description}
-  </Typography>
+          sx={{
+            padding: "1rem",
+            background: "linear-gradient(to right, #f8f9fa, #e9ecef)",
+            borderRadius: "10px",
+            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+          }}
+        >
+          <Typography variant="body1" sx={{ fontWeight: "bold", color: "#333", fontSize: "1.1rem" }}>
+            Description:
+          </Typography>
+          <Typography variant="body2" sx={{ color: "#555", paddingBottom: "0.5rem", fontSize: "1rem" }}>
+            {assignmentData.description}
+          </Typography>
 
-  <Typography
-    variant="body1"
-    sx={{ fontWeight: "bold", color: "#333", fontSize: "1.1rem" }}
-  >
-    Difficulty:
-  </Typography>
-  <Typography
-    variant="body2"
-    sx={{ color: "#555", paddingBottom: "0.5rem", fontSize: "1rem" }}
-  >
-    {assignmentData.difficulty}
-  </Typography>
-
-  <Typography
-    variant="body1"
-    sx={{ fontWeight: "bold", color: "#333", fontSize: "1.1rem" }}
-  >
-    Status:
-  </Typography>
-  <Typography
-    variant="body2"
-    sx={{
-      color:
-        assignmentData.status === "Completed" ? "green" : "orange",
-      fontWeight: "bold",
-      paddingBottom: "0.5rem",
-      fontSize: "1rem",
-    }}
-  >
-    {assignmentData.status}
-  </Typography>
-
-  <Typography
-    variant="body1"
-    sx={{ fontWeight: "bold", color: "#333", fontSize: "1.1rem" }}
-  >
-    Start Date:
-  </Typography>
-  <Typography
-    variant="body2"
-    sx={{ color: "#555", paddingBottom: "0.5rem", fontSize: "1rem" }}
-  >
-    {new Date(assignmentData.startdate).toLocaleString()}
-  </Typography>
-
-  <Typography
-    variant="body1"
-    sx={{ fontWeight: "bold", color: "#333", fontSize: "1.1rem" }}
-  >
-    End Date:
-  </Typography>
-  <Typography
-    variant="body2"
-    sx={{ color: "#555", fontSize: "1rem" }}
-  >
-    {new Date(assignmentData.enddate).toLocaleString()}
-  </Typography>
-
-  {/* File Download Section */}
+          {/* File Download Section */}
           {filepath && filepath !== "" && filename !== "no_file" && (
-            <Typography
-              variant="body2"
-              sx={{
-                marginTop: "8px",
-                fontSize: "0.95rem",
-                fontWeight: "bold",
-              }}
-            >
+            <Typography variant="body2" sx={{ marginTop: "8px", fontSize: "0.95rem", fontWeight: "bold" }}>
               📄 Resource:{" "}
               <a
                 href={`http://localhost:8080/api/download/${filename}`}
@@ -203,8 +156,7 @@ export default function AccordionUsage({ assignment, index }) {
               </a>
             </Typography>
           )}
-</AccordionDetails>
-
+        </AccordionDetails>
 
         <Box sx={{ display: "flex", padding: "1rem", gap: 1, justifyContent: "flex-end" }}>
           <Button variant="contained" size="small" color="primary" onClick={handleEdit} sx={{ borderRadius: "20px" }}>
