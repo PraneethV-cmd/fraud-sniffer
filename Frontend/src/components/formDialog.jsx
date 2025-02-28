@@ -49,7 +49,7 @@ export function FormDialogEditAssignment({ open, onClose, assignment, onSave }) 
   const handleSubmit = (event) => {
     event.preventDefault();
     try {
-      fetch(`http://localhost:8080/api/assignment/${assignment.assignmentID}`, {
+      fetch(`http://localhost:8080/api/assignment/${assignment.assignmentid}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

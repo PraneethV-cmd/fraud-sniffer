@@ -14,12 +14,12 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy"; // Copy icon
 import { FormDialogEditAssignment } from "./formDialog";
 
 export default function AccordionUsage({ assignment, index }) {
-  const { title, description, difficulty, status, startdate, enddate, assignmentID, filepath, filename, originalfilename, join_code } = assignment;
+  const { title, description, difficulty, status, startdate, enddate, assignmentid, filepath, filename, originalfilename, join_code } = assignment;
 
   const [open, setOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [assignmentData, setAssignmentData] = useState({
-    assignmentID,
+    assignmentid,
     title,
     description,
     difficulty,
@@ -47,9 +47,8 @@ export default function AccordionUsage({ assignment, index }) {
 
   // Handle delete confirmation
   const handleConfirmDelete = () => {
-    console.log("Deleting assignment with ID:", assignmentData.assignmentID);
-
-    fetch(`http://localhost:8080/api/assignment/${assignmentData.assignmentID}`, {
+    console.log("Assignment Data: ", assignmentData);
+    fetch(`http://localhost:8080/api/assignment/${assignmentData.assignmentid}`, {
       method: "DELETE",
     })
       .then((response) => {
@@ -133,6 +132,63 @@ export default function AccordionUsage({ assignment, index }) {
           </Typography>
           <Typography variant="body2" sx={{ color: "#555", paddingBottom: "0.5rem", fontSize: "1rem" }}>
             {assignmentData.description}
+          </Typography>
+          <Typography
+            variant="body1"
+            sx={{ fontWeight: "bold", color: "#333", fontSize: "1.1rem" }}
+          >
+            Difficulty:
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{ color: "#555", paddingBottom: "0.5rem", fontSize: "1rem" }}
+          >
+            {assignmentData.difficulty}
+          </Typography>
+
+          <Typography
+            variant="body1"
+            sx={{ fontWeight: "bold", color: "#333", fontSize: "1.1rem" }}
+          >
+            Status:
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              color:
+                assignmentData.status === "Completed" ? "green" : "orange",
+              fontWeight: "bold",
+              paddingBottom: "0.5rem",
+              fontSize: "1rem",
+            }}
+          >
+            {assignmentData.status}
+          </Typography>
+
+          <Typography
+            variant="body1"
+            sx={{ fontWeight: "bold", color: "#333", fontSize: "1.1rem" }}
+          >
+            Start Date:
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{ color: "#555", paddingBottom: "0.5rem", fontSize: "1rem" }}
+          >
+            {new Date(assignmentData.startdate).toLocaleString()}
+          </Typography>
+
+          <Typography
+            variant="body1"
+            sx={{ fontWeight: "bold", color: "#333", fontSize: "1.1rem" }}
+          >
+            End Date:
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{ color: "#555", fontSize: "1rem" }}
+          >
+            {new Date(assignmentData.enddate).toLocaleString()}
           </Typography>
 
           {/* File Download Section */}
