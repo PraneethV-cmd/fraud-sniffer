@@ -22,6 +22,7 @@
     "@mui/material": "^6.4.4",
     "@mui/styled-engine-sc": "^6.4.3",
     "accordion": "^3.0.2",
+    "bootstrap": "^5.3.3",
     "cursor-effects": "^1.0.17",
     "jszip": "^3.10.1",
     "jzip": "^1.0.0",
