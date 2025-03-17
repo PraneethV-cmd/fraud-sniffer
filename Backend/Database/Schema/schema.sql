@@ -12,7 +12,6 @@ CREATE TABLE users (
   userName VARCHAR(255) NOT NULL,
   password TEXT NOT NULL, -- Support for hashed passwords
   email VARCHAR(255) NOT NULL UNIQUE,
-  role VARCHAR(255) NOT NULL
 );
 
 -- Create Assignments Table with Secure Join Code
@@ -72,12 +71,13 @@ CREATE TABLE plagiarism_reports (
 );
 
 -- Insert Users details.
-INSERT INTO users (userName, password, email, role) VALUES
-('user1', 'user1', 'alice@example.com', 'student'),
-('user2', 'user2', 'bob@example.com', 'student'),
-('user3', 'user3', 'charlie@example.com', 'student'),
-('user4', 'user4', 'david@example.com', 'instructor'),
-('user5', 'user5', 'emma@example.com', 'student');
+INSERT INTO users (userName, password, email) VALUES
+('user1', 'user1', 'alice@example.com'),
+('user2', 'user2', 'bob@example.com'),
+('user3', 'user3', 'charlie@example.com'),
+('user4', 'user4', 'david@example.com'
+),
+('user5', 'user5', 'emma@example.com');
 
 -- Insert Assignments with Default File Information
 INSERT INTO assignments (userID, title, description, startDate, endDate, difficulty, status, join_code) VALUES
