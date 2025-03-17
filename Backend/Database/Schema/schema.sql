@@ -10,8 +10,8 @@ DROP TABLE IF EXISTS plagiarism_reports CASCADE;
 CREATE TABLE users (
   userID SERIAL PRIMARY KEY,
   userName VARCHAR(255) NOT NULL,
-  password TEXT NOT NULL, -- Support for hashed passwords
-  email VARCHAR(255) NOT NULL UNIQUE,
+  password VARCHAR(255) NOT NULL, -- Support for hashed passwords
+  email VARCHAR(255) NOT NULL UNIQUE
 );
 
 -- Create Assignments Table with Secure Join Code
@@ -72,11 +72,10 @@ CREATE TABLE plagiarism_reports (
 
 -- Insert Users details.
 INSERT INTO users (userName, password, email) VALUES
-('user1', 'user1', 'alice@example.com'),
+('user1', '$2b$10$KMyMEvTkDcbx/RYToDC6J.hOBvUmvYHisEQ1IuTWMRHTgbHUvcDc2', 'alice@example.com'),
 ('user2', 'user2', 'bob@example.com'),
 ('user3', 'user3', 'charlie@example.com'),
-('user4', 'user4', 'david@example.com'
-),
+('user4', 'user4', 'david@example.com'),
 ('user5', 'user5', 'emma@example.com');
 
 -- Insert Assignments with Default File Information
