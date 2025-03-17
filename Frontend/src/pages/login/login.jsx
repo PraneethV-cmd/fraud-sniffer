@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./login.css";
 
 function Login() {
-    const [registerData, setRegisterData] = useState({ name: "", email: "", password: "" });
-    const [loginData, setLoginData] = useState({ email: "", password: "" });
+    const [registerData, setRegisterData] = useState({ username: "", email: "", password: "" });
+    const [loginData, setLoginData] = useState({ usernameORemail: "", password: "" });
     const [errors, setErrors] = useState({});
     const [registerMessage, setRegisterMessage] = useState("");
     const [loginMessage, setLoginMessage] = useState("");
+
+    const navigate = useNavigate();
 
     const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
@@ -29,9 +32,9 @@ function Login() {
 
     const validateRegister = () => {
         let newErrors = {};
-        const { name, email, password } = registerData;
+        const { username, email, password } = registerData;
 
-        if (!name.trim()) newErrors.name = "Name is required";
+        if (!username.trim()) newErrors.name = "Name is required";
         if (!email.trim()) newErrors.email = "Email is required";
         else if (!isValidEmail(email)) newErrors.email = "Invalid email format";
 
@@ -44,10 +47,9 @@ function Login() {
 
     const validateLogin = () => {
         let newErrors = {};
-        const { email, password } = loginData;
+        const { usernameORemail, password } = loginData;
 
-        if (!email.trim()) newErrors.loginEmail = "Email is required";
-        else if (!isValidEmail(email)) newErrors.loginEmail = "Invalid email format";
+        if (!usernameORemail.trim()) newErrors.loginEmail = "Username / Email is required";
 
         if (!password.trim()) newErrors.loginPassword = "Password is required";
 
@@ -60,7 +62,7 @@ function Login() {
         if (!validateRegister()) return;
 
         try {
-            const response = await fetch("http://localhost:8080/register", {
+            const response = await fetch("http://localhost:8080/api/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(registerData),
@@ -69,7 +71,8 @@ function Login() {
             const data = await response.json();
             if (response.ok) {
                 setRegisterMessage("User successfully registered! You can now login.");
-                setRegisterData({ name: "", email: "", password: "" });
+                setRegisterData({ username: "", email: "", password: "" });
+                SwitchContent();
             } else {
                 setRegisterMessage(data.message);
             }
@@ -83,17 +86,25 @@ function Login() {
         if (!validateLogin()) return;
 
         try {
-            const response = await fetch("http://localhost:8080/login", {
+            const response = await fetch("http://localhost:8080/api/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(loginData),
             });
 
             const data = await response.json();
+            console.log(response);
             if (response.ok) {
                 setLoginMessage("Login successful! Redirecting...");
-                localStorage.setItem("token", data.token);
-                window.location.href = "/";
+                const token = data.token;
+                
+                const parts = token.split('.');
+                const decodedPayload = JSON.parse(atob(parts[1]));
+                const userID = decodedPayload.userID;
+                
+                sessionStorage.setItem("token", token);
+                sessionStorage.setItem("userID", userID);
+                navigate("/home");
             } else {
                 setLoginMessage(data.message || "Invalid email or password");
             }
@@ -116,7 +127,7 @@ function Login() {
                         <input 
                             type='text' 
                             id="register-name"
-                            name="name" 
+                            name="username" 
                             placeholder='Name' 
                             className='form-control form-control-lg bg-light fs-6' 
                             value={registerData.name} 
@@ -174,10 +185,10 @@ function Login() {
                     <div className='input-group mb-3'>
                         <label htmlFor="login-email" className="visually-hidden">Email</label>
                         <input 
-                            type='email' 
+                            type='text' 
                             id="login-email"
-                            name="email" 
-                            placeholder='Email' 
+                            name="usernameORemail" 
+                            placeholder='Username / Email' 
                             className='form-control form-control-lg bg-light fs-6' 
                             value={loginData.email} 
                             onChange={(e) => handleChange(e, "login")} 

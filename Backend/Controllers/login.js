@@ -10,7 +10,7 @@ const Login = async (req, res) => {
             return res.status(500).json({ error: "Login failed" });
         }
 
-        res.status(response.code).json(response.body.message);
+        res.status(response.code).json(response.body);
     } catch (err) {
         console.error("Login error:", err);
         res.status(500).json({ error: "Server error" });
