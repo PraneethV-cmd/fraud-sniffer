@@ -19,7 +19,7 @@ const menuItems = [
 
 export default function CustomDrawer() {
   const [open, setOpen] = useState(false);
-  
+
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
   };
@@ -44,8 +44,15 @@ export default function CustomDrawer() {
             <ListItemButton
               sx={{
                 color: "#fff",
-                '&:hover': { backgroundColor: "#2a2a3d" },
-                padding: "12px 20px"
+                padding: "12px 20px",
+                transition: "all 0.3s ease-in-out",
+                position: "relative",
+                overflow: "hidden",
+                "&:hover": {
+                  backgroundColor: "#2a2a3d",
+                  boxShadow: "0px 0px 15px rgba(0, 255, 255, 0.6)",
+                  transform: "scale(1.05)"
+                }
               }}
             >
               <FontAwesomeIcon icon={icon} style={{ marginRight: 15 }} />

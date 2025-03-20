@@ -54,7 +54,7 @@ CREATE TABLE submissions (
   submissionFilename TEXT NOT NULL DEFAULT 'no_file',
   submissionOriginalFilename TEXT NOT NULL DEFAULT 'no_file',
   submissionFilePath TEXT NOT NULL DEFAULT '',
-  submissionFileType VARCHAR(50) NOT NULL DEFAULT 'unknown',
+  submissionFileType VARCHAR(255) NOT NULL DEFAULT 'unknown',
   submissionFileSize BIGINT NOT NULL DEFAULT 0,
   submissionIsZip BOOLEAN DEFAULT FALSE,
   submissionDate TIMESTAMP,
