@@ -45,6 +45,15 @@ export default function AccordionUsage({ assignment, index }) {
     setDeleteDialogOpen(true);
   };
 
+  const handleCheckPlagiarism = () => {
+    console.log("Checking Plagiarism for assignment: ", assignmentData.assignmentid);
+    
+    // Use window.open() to open the Flask route in a new tab
+    const url = `http://127.0.0.1:5000/?uploadFolder=../Backend/uploads/${assignmentData.assignmentid}`;
+    window.open(url, "_blank");
+  }
+
+
   // Handle delete confirmation
   const handleConfirmDelete = () => {
     console.log("Assignment Data: ", assignmentData);
@@ -220,6 +229,9 @@ export default function AccordionUsage({ assignment, index }) {
           </Button>
           <Button variant="contained" size="small" color="error" onClick={handleDeleteClick} sx={{ borderRadius: "20px" }}>
             ❌ Delete
+          </Button>
+          <Button variant="contained" size="small" color="secondary" onClick={handleCheckPlagiarism} sx={{ borderRadius: "20px" }}>
+            ▶️ Run Plagiarism
           </Button>
         </Box>
       </Accordion>
