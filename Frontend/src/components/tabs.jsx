@@ -256,36 +256,7 @@ export default function ColorTabs() {
               </Typography>
             )}
 
-            {/* Floating "+JOIN" Button */}
-            <Fab 
-              color="primary" 
-              aria-label="join" 
-              onClick={handleOpenJoinDialog} 
-              sx={{ position: "fixed", bottom: 20, right: 20 }}
-            >
-              <AddIcon />
-            </Fab>
-
-            {/* Join Code Dialog */}
-            <Dialog open={openJoinDialog} onClose={handleCloseJoinDialog}>
-              <DialogTitle>Enter Join Code</DialogTitle>
-              <DialogContent>
-                <TextField
-                  autoFocus
-                  margin="dense"
-                  label="Join Code"
-                  type="text"
-                  fullWidth
-                  variant="outlined"
-                  value={joinCode}
-                  onChange={(e) => setJoinCode(e.target.value)}
-                />
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={handleCloseJoinDialog} color="error">Cancel</Button>
-                <Button onClick={handleSubmitJoinCode} color="primary" variant="contained">Submit</Button>
-              </DialogActions>
-            </Dialog>
+            
           </>
         )}
       </Box>
@@ -312,6 +283,36 @@ export default function ColorTabs() {
 
       {value === "Create Assignments" && <CreateAssignmentForm />}
       {value === "Check Plagiarism" && <div>Plagiarism Checker</div>}
+      {/* Floating "+JOIN" Button */}
+      <Fab 
+        color="primary" 
+        aria-label="join" 
+        onClick={handleOpenJoinDialog} 
+        sx={{ position: "fixed", bottom: 20, right: 20 }}
+      >
+        <AddIcon />
+      </Fab>
+            
+      {/* Join Code Dialog */}
+      <Dialog open={openJoinDialog} onClose={handleCloseJoinDialog}>
+        <DialogTitle>Enter Join Code</DialogTitle>
+          <DialogContent>
+            <TextField
+                  autoFocus
+                  margin="dense"
+                  label="Join Code"
+                  type="text"
+                  fullWidth
+                  variant="outlined"
+                  value={joinCode}
+                  onChange={(e) => setJoinCode(e.target.value)}
+              />
+            </DialogContent>
+            <DialogActions>
+            <Button onClick={handleCloseJoinDialog} color="error">Cancel</Button>
+            <Button onClick={handleSubmitJoinCode} color="primary" variant="contained">Submit</Button>
+          </DialogActions>
+      </Dialog>
     </Box>
   );
 }

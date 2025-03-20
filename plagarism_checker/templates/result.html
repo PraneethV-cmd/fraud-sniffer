@@ -74,8 +74,28 @@
             </table>
         {% endfor %}
 
+        <h2>Similarity Between Uploaded Files</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>File 1</th>
+                    <th>File 2</th>
+                    <th>Similarity (%)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for similarity in internal_similarities %}
+                    <tr>
+                        <td>{{ similarity.file1 }}</td>
+                        <td>{{ similarity.file2 }}</td>
+                        <td>{{ (similarity.similarity * 100) | round(2) }}%</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
         <div class="button-container">
-            <a class="btn" href="/">Upload More Files</a>
+            <a class="btn" href="/">Check Again</a>
             <a class="btn" href="/download">Download Report as PDF</a>
         </div>
     </div>

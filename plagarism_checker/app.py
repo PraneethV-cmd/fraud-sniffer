@@ -10,6 +10,13 @@ from pdfminer.high_level import extract_text
 from docx import Document
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet
+
+import transformers
+transformers.logging.set_verbosity_error()
 
 app = Flask(__name__)
 UPLOAD_FOLDER = "uploads"
@@ -60,66 +67,119 @@ def check_text_similarity(original_text, web_texts):
     similarities = (vectors @ vectors.T)[0][1:]
     return [(web_texts[i][0], similarities[i]) for i in range(len(web_texts))]
 
-def generate_pdf(results):
+def generate_pdf(results, internal_similarities):
     pdf_path = os.path.join(REPORT_FOLDER, "plagiarism_report.pdf")
-    c = canvas.Canvas(pdf_path, pagesize=letter)
-    width, height = letter
-    y_position = height - 40  # Start position for writing
+    doc = SimpleDocTemplate(pdf_path, pagesize=letter)
+    elements = []
+    
+    styles = getSampleStyleSheet()
+    title_style = styles["Title"]
+    heading_style = styles["Heading2"]
+    normal_style = styles["Normal"]
 
-    c.setFont("Helvetica-Bold", 16)
-    c.drawString(200, y_position, "Plagiarism Check Report")
-    y_position -= 30
+    # Title
+    elements.append(Paragraph("Plagiarism Check Results", title_style))
+    elements.append(Spacer(1, 12))
 
+    # Loop through results and format them
     for result in results:
-        c.setFont("Helvetica-Bold", 12)
-        c.drawString(50, y_position, f"File: {result['filename']}")
-        y_position -= 20
-        c.setFont("Helvetica", 12)
-        c.drawString(50, y_position, f"AI-Generated Content Score: {round(result['ai_score'], 2)}")
-        y_position -= 20
+        elements.append(Paragraph(f"File: {result['filename']}", heading_style))
+        elements.append(Paragraph(f"<b>AI-Generated Content Score:</b> {round(result['ai_score'], 2)}", normal_style))
+        elements.append(Spacer(1, 6))
 
-        c.setFont("Helvetica-Bold", 12)
-        c.drawString(50, y_position, "Online Plagiarism Matches:")
-        y_position -= 20
+        # Plagiarism Table
+        if result["plagiarism_results"]:
+            table_data = [["Source URL", "Similarity (%)"]]
+            for url, similarity in result["plagiarism_results"]:
+                table_data.append([Paragraph(f'<a href="{url}" color="blue">{url}</a>', normal_style), f"{round(similarity * 100, 2)}%"])
+            
+            table = Table(table_data, colWidths=[350, 100])
+            table.setStyle(TableStyle([
+                ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
+                ("TEXTCOLOR", (0, 0), (-1, 0), colors.black),
+                ("ALIGN", (0, 0), (-1, -1), "LEFT"),
+                ("GRID", (0, 0), (-1, -1), 1, colors.black),
+                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold")
+            ]))
+            elements.append(table)
+            elements.append(Spacer(1, 12))
 
-        c.setFont("Helvetica", 10)
-        for url, similarity in result["plagiarism_results"]:
-            c.drawString(60, y_position, f"{url} - Similarity: {round(similarity * 100, 2)}%")
-            y_position -= 15
-            if y_position < 50:  # If close to bottom, start a new page
-                c.showPage()
-                y_position = height - 40
+    # Similarity Between Uploaded Files
+    if internal_similarities:
+        elements.append(Paragraph("Similarity Between Uploaded Files", heading_style))
+        elements.append(Spacer(1, 6))
 
-        y_position -= 20  # Extra spacing between results
+        table_data = [["File 1", "File 2", "Similarity (%)"]]
+        for sim in internal_similarities:
+            table_data.append([sim["file1"], sim["file2"], f"{round(sim['similarity'] * 100, 2)}%"])
+        
+        table = Table(table_data, colWidths=[200, 200, 100])
+        table.setStyle(TableStyle([
+            ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
+            ("TEXTCOLOR", (0, 0), (-1, 0), colors.black),
+            ("ALIGN", (0, 0), (-1, -1), "LEFT"),
+            ("GRID", (0, 0), (-1, -1), 1, colors.black),
+            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold")
+        ]))
+        elements.append(table)
 
-    c.save()
+    # Build the PDF
+    doc.build(elements)
     return pdf_path
 
 @app.route("/", methods=["GET", "POST"])
+@app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
-        files = request.files.getlist("file")
         results = []
-        
-        for file in files:
-            if file:
-                file_path = os.path.join(UPLOAD_FOLDER, file.filename)
-                file.save(file_path)
-                text = read_file(file_path)
-                ai_score = check_ai_generated(text)
-                web_results = google_search_check(text)
-                similarity_scores = check_text_similarity(text, web_results)
-                
-                results.append({
-                    "filename": file.filename,
-                    "ai_score": ai_score,
-                    "plagiarism_results": similarity_scores
-                })
+        files = [f for f in os.listdir(UPLOAD_FOLDER) if f.endswith((".pdf", ".docx", ".txt"))]
+        file_texts = {}  # Store file contents for internal similarity check
 
-        pdf_path = generate_pdf(results)
-        return render_template("result.html", results=results, pdf_path=pdf_path)
-    
+        for file in files:
+            file_path = os.path.join(UPLOAD_FOLDER, file)
+            text = read_file(file_path)
+            file_texts[file] = text  # Store text for later similarity check
+            
+            ai_score = check_ai_generated(text)
+            web_results = google_search_check(text)
+            similarity_scores = check_text_similarity(text, web_results)
+
+            results.append({
+                "filename": file,
+                "ai_score": ai_score,
+                "plagiarism_results": similarity_scores
+            })
+
+        # Sort results by AI score in descending order
+        results.sort(key=lambda x: x["ai_score"], reverse=True)
+
+        # Check similarity between uploaded files
+        internal_similarities = check_internal_similarity(file_texts)
+
+        pdf_path = generate_pdf(results,internal_similarities)
+        return render_template("result.html", results=results, internal_similarities=internal_similarities, pdf_path=pdf_path)
+
     return render_template("index.html")
+
+def check_internal_similarity(file_texts):
+    """Compare similarity between uploaded files using TF-IDF."""
+    file_names = list(file_texts.keys())
+    texts = list(file_texts.values())
+
+    vectorizer = TfidfVectorizer().fit_transform(texts)
+    vectors = vectorizer.toarray()
+    similarity_matrix = vectors @ vectors.T  # Cosine similarity
+
+    internal_similarities = []
+    for i in range(len(file_names)):
+        for j in range(i + 1, len(file_names)):  # Avoid redundant comparisons
+            internal_similarities.append({
+                "file1": file_names[i],
+                "file2": file_names[j],
+                "similarity": similarity_matrix[i][j]
+            })
+
+    return sorted(internal_similarities, key=lambda x: x["similarity"], reverse=True)
 
 @app.route("/download")
 def download_pdf():

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { use, useState } from "react";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import Button from "@mui/material/Button";
@@ -7,14 +7,16 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBars, faHome, faTasks, faClipboardCheck, faBell, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faHome, faTasks, faClipboardCheck, faBell, faUser, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
+import { useNavigate } from "react-router-dom";
 
 const menuItems = [
   { text: "Home", icon: faHome },
   { text: "Assignments", icon: faTasks },
   { text: "Plagiarism Check", icon: faClipboardCheck },
   { text: "Notifications", icon: faBell },
-  { text: "Profile", icon: faUser }
+  { text: "Profile", icon: faUser },
+  { text: "Logout", icon: faSignOutAlt }
 ];
 
 export default function CustomDrawer() {
@@ -22,6 +24,14 @@ export default function CustomDrawer() {
 
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
+  };
+
+  const handleMenuClick = (e) => {
+    console.log(e);
+    if(e.target.innerText == "Logout"){
+      sessionStorage.clear();
+      navigate("/login");
+    }
   };
 
   const DrawerList = (
@@ -40,7 +50,7 @@ export default function CustomDrawer() {
     >
       <List>
         {menuItems.map(({ text, icon }) => (
-          <ListItem key={text} disablePadding>
+          <ListItem key={text} disablePadding onClick={(e) => handleMenuClick(e)}>
             <ListItemButton
               sx={{
                 color: "#fff",

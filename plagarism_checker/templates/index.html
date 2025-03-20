@@ -5,9 +5,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <h2>Upload Files to Check for Plagiarism</h2>
-    <form action="/" method="post" enctype="multipart/form-data">
-        <input type="file" name="file" multiple required>
+    <h2>Check Plagiarism for All Files in Uploads</h2>
+    <form action="/" method="post">
         <button type="submit">Check</button>
     </form>
 </body>
