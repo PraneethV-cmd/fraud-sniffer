@@ -282,7 +282,25 @@ export default function ColorTabs() {
       )}
 
       {value === "Create Assignments" && <CreateAssignmentForm />}
-      {value === "Check Plagiarism" && <div>Plagiarism Checker</div>}
+      {value === "Check Plagiarism" && (
+        <Box sx={{ marginTop: 2, width: "100%" }}>
+          {loading ? (
+            <Box display="flex" justifyContent="center" mt={4}>
+              <CircularProgress color="primary" />
+            </Box>
+          ) : managableAssignments.length > 0 ? (
+            <>
+              {managableAssignments.map((assignment, index) => (
+                <AccordionUsage key={`manage_assignments-${assignment.assignmentid}`} index={index} assignment={assignment} />
+              ))}
+            </>
+          ) : (
+            <Typography variant="h6" textAlign="center" mt={4}>
+              No assignments found.
+            </Typography>
+          )}
+        </Box>
+      )}
       {/* Floating "+JOIN" Button */}
       <Fab 
         color="primary" 

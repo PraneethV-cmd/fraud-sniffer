@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, send_file
+from flask import Flask, render_template, request, send_file, jsonify
 import os
 import requests
 import torch
@@ -14,14 +14,14 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
+from flask_cors import CORS
 
 import transformers
 transformers.logging.set_verbosity_error()
 
 app = Flask(__name__)
-UPLOAD_FOLDER = "uploads"
+CORS(app)
 REPORT_FOLDER = "reports"
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(REPORT_FOLDER, exist_ok=True)
 
 # Load AI detector model
@@ -126,11 +126,10 @@ def generate_pdf(results, internal_similarities):
     # Build the PDF
     doc.build(elements)
     return pdf_path
-
-@app.route("/", methods=["GET", "POST"])
-@app.route("/", methods=["GET", "POST"])
+@app.route("/", methods=["GET"])
 def index():
-    if request.method == "POST":
+    UPLOAD_FOLDER = request.args.get('uploadFolder')  # Use query parameter
+    if UPLOAD_FOLDER:
         results = []
         files = [f for f in os.listdir(UPLOAD_FOLDER) if f.endswith((".pdf", ".docx", ".txt"))]
         file_texts = {}  # Store file contents for internal similarity check
@@ -156,9 +155,17 @@ def index():
         # Check similarity between uploaded files
         internal_similarities = check_internal_similarity(file_texts)
 
-        pdf_path = generate_pdf(results,internal_similarities)
-        return render_template("result.html", results=results, internal_similarities=internal_similarities, pdf_path=pdf_path)
+        pdf_path = generate_pdf(results, internal_similarities)
 
+        # Render the HTML result page
+        return render_template(
+            "result.html",
+            results=results,
+            internal_similarities=internal_similarities,
+            pdf_path=pdf_path
+        )
+
+    # Default landing page
     return render_template("index.html")
 
 def check_internal_similarity(file_texts):
