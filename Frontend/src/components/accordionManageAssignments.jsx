@@ -56,6 +56,60 @@ export default function AccordionUsage({ assignment, index }) {
     setSubmissionDialogOpen(true);
   };
 
+  // Handle edit button click
+  const handleEdit = () => {
+    setOpen(true);
+  };
+
+  // Handle save after editing
+  const handleSave = (updatedData) => {
+    setAssignmentData((prev) => ({ ...prev, ...updatedData }));
+    console.log("Updated Assignment:", updatedData);
+  };
+
+  // Open delete confirmation dialog
+  const handleDeleteClick = () => {
+    setDeleteDialogOpen(true);
+  };
+
+  const handleCheckPlagiarism = () => {
+    const submittedFile = submissions.filter((submission) => submission.submissionfilename !== "no_file");
+    if(submittedFile.length <= 0){
+      alert("No submissions found for this assignment!");
+      return;
+    }else if(submittedFile.length === 1){
+      alert("Only one submission found. Plagiarism check requires atleast 2 submissions!");
+      return;
+    }
+    console.log("Checking Plagiarism for assignment: ", assignmentData.assignmentid);
+    
+    // Use window.open() to open the Flask route in a new tab
+    const url = `http://127.0.0.1:5000/?uploadFolder=../Backend/uploads/${assignmentData.assignmentid}`;
+    window.open(url, "_blank");
+  }
+
+
+  // Handle delete confirmation
+  const handleConfirmDelete = () => {
+    console.log("Assignment Data: ", assignmentData);
+    fetch(`http://localhost:8080/api/assignment/${assignmentData.assignmentid}`, {
+      method: "DELETE",
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error("Failed to delete assignment");
+        console.log("Assignment deleted successfully!");
+      })
+      .catch((error) => console.error("Error deleting assignment:", error));
+
+    setDeleteDialogOpen(false);
+  };
+
+  // Copy Join Code to clipboard
+  const handleCopyjoin_code = () => {
+    navigator.clipboard.writeText(assignmentData.join_code);
+    alert("Join Code copied: " + assignmentData.join_code);
+  };
+
   return (
     <div>
       <Accordion key={index}>
@@ -69,7 +123,7 @@ export default function AccordionUsage({ assignment, index }) {
           <Button
             variant="contained"
             size="small"
-            onClick={() => navigator.clipboard.writeText(assignmentData.join_code)}
+            onClick={handleCopyjoin_code}
             sx={{ minWidth: "40px", marginLeft: "10px" }}
           >
             <ContentCopyIcon fontSize="small" />
@@ -107,11 +161,14 @@ export default function AccordionUsage({ assignment, index }) {
           <Button variant="contained" size="small" color="secondary" onClick={handleViewSubmissions}>
             👁️ View Submissions
           </Button>
-          <Button variant="contained" size="small" color="primary" onClick={() => setOpen(true)}>
+          <Button variant="contained" size="small" color="primary" onClick={handleEdit}>
             ✏️ Edit
           </Button>
-          <Button variant="contained" size="small" color="error" onClick={() => setDeleteDialogOpen(true)}>
+          <Button variant="contained" size="small" color="error" onClick={handleDeleteClick} >
             ❌ Delete
+          </Button>
+          <Button variant="contained" size="small" color="secondary" onClick={handleCheckPlagiarism} sx={{ borderRadius: "20px" }}>
+            ▶️ Run Plagiarism
           </Button>
         </Box>
       </Accordion>
@@ -173,7 +230,7 @@ export default function AccordionUsage({ assignment, index }) {
       </Dialog>
 
       {/* Edit Dialog */}
-      <FormDialogEditAssignment open={open} onClose={() => setOpen(false)} assignment={assignmentData} />
+      <FormDialogEditAssignment open={open} onClose={() => setOpen(false)} assignment={assignmentData} onSave={handleSave} />
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
@@ -183,7 +240,7 @@ export default function AccordionUsage({ assignment, index }) {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDeleteDialogOpen(false)} color="primary">Cancel</Button>
-          <Button color="error" variant="contained">Delete</Button>
+          <Button onClick={handleConfirmDelete} color="error" variant="contained">Delete</Button>
         </DialogActions>
       </Dialog>
     </div>
