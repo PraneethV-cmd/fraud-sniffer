@@ -79,12 +79,26 @@ export default function ColorTabs() {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       }).then((response) => response.json()),
+
+      fetch(`http://localhost:8080/api/assignment/view?userID=${userID}&type=getSubmissions`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      }).then((response) => response.json()),
     ])
-      .then(([participantData, ownerData]) => {
+      .then(([participantData, ownerData, submissionData]) => {
         console.log("Participant:", participantData);
-        console.log("Owner:", ownerData);
+
+        // Merge submission details into ownerData
+        const ownerDataWithSubmissions = ownerData.map(ownerAssignment => {
+          // Find all submissions for this assignment
+          const submissions = submissionData.filter(sub => sub.assignmentid === ownerAssignment.assignmentid);
+          return { ...ownerAssignment, submissions }; // Add submissions array to assignment
+        });
+
+        console.log("Owner Data:", ownerDataWithSubmissions);
+
         setAssignmentList(participantData);
-        setManagableAssignments(ownerData);
+        setManagableAssignments(ownerDataWithSubmissions);
       })
       .catch((err) => {
         console.error("Error fetching assignments:", err);

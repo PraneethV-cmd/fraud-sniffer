@@ -88,7 +88,7 @@ export default function ViewAssignmentsAccordion({ index, assignment }) {
             >
               📄 Resource:{" "}
               <a
-                href={`http://localhost:8080/api/download/${assignment.filename}`}
+                href={`http://localhost:8080/api/download/${assignment.filename}?path=root`}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
@@ -116,7 +116,7 @@ export default function ViewAssignmentsAccordion({ index, assignment }) {
             >
               📄 Submitted :{" "}
               <a
-                href={`http://localhost:8080/api/download/${assignment.submissionfilename}`}
+                href={`http://localhost:8080/api/download/${assignment.submissionfilename}?path=${assignment.assignmentid}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
