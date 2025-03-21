@@ -5,6 +5,7 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import AccordionUsage from "./accordionManageAssignments";
 import ViewAssignmentsAccordion from "./accordionViewAssignments";
+import AccordionPlagiarismChecker from "./accordionPlagiarismChecker";
 import CreateAssignmentForm from "./CreateAssignmentForm";
 import { Context } from "../context/context";
 import AutohideSnackbar from "./snackBar";
@@ -305,7 +306,7 @@ export default function ColorTabs() {
           ) : managableAssignments.length > 0 ? (
             <>
               {managableAssignments.map((assignment, index) => (
-                <AccordionUsage key={`manage_assignments-${assignment.assignmentid}`} index={index} assignment={assignment} />
+                <AccordionPlagiarismChecker key={`plagiarism-checker-${assignment.assignmentid}`} index={index} assignment={assignment} />
               ))}
             </>
           ) : (
