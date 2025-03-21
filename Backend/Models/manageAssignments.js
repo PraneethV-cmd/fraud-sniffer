@@ -157,9 +157,37 @@ const manageAssignmentsModel = {
             } else if (type === "owner") {
                 query = `
                     SELECT *
-                    FROM assignments a
-                    INNER JOIN users u ON a.userID = u.userID
+                    FROM users u
+                    INNER JOIN assignments a ON u.userID = a.userID
                     WHERE u.userID = $1;`;
+            } else if (type === "getSubmissions") {
+                query = `
+                    SELECT 
+                        a.assignmentID,
+                        a.title,
+                        a.description,
+                        a.startDate,
+                        a.endDate,
+                        a.difficulty,
+                        a.status,
+                        a.join_code,
+                        ai.userID AS participantID,
+                        u.userName AS participantName,
+                        s.submissionID,
+                        s.submissionFilename,
+                        s.submissionOriginalFilename,
+                        s.submissionFilePath,
+                        s.submissionFileType,
+                        s.submissionFileSize,
+                        s.submissionStatus,
+                        s.submissionDate
+                    FROM assignments a
+                    INNER JOIN assignmentsinfo ai ON a.assignmentID = ai.assignmentID
+                    INNER JOIN users u ON ai.userID = u.userID -- Get participant details
+                    LEFT JOIN submissions s ON ai.assignmentInfoID = s.assignmentInfoID -- Get submission details
+                    WHERE a.userID = $1  -- Fetch assignments created by the given user
+                    ORDER BY a.assignmentID, s.submissionDate DESC;
+                    `;
             } else {
                 throw new Error("Invalid type provided");
             }
@@ -209,8 +237,8 @@ const manageAssignmentsModel = {
             }
 
             const joinResult = await dbPool.query(
-                "INSERT INTO assignmentsinfo (assignmentID, userID, status) VALUES ($1, $2, $3) RETURNING *",
-                [assignmentid, userID, 'IN_PROGRESS']
+                "INSERT INTO assignmentsinfo (assignmentID, userID) VALUES ($1, $2) RETURNING *",
+                [assignmentid, userID]
             );
 
             const assignmentinfoid = joinResult.rows[0].assignmentinfoid;

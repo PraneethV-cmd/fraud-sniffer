@@ -3,7 +3,8 @@ const fileModel = require("../Models/fileModel");
 const fileController = async (req, res) => {
     try {
         const filename = req.params.filename;
-        const response = await fileModel(filename);
+        const { path } = req.query;
+        const response = await fileModel(filename, path);
         if(response.filePath === undefined || response.fileName === undefined) throw new Error(response.body.message);
         res.download(response.filePath, response.fileName, (err) => {
             if (err) {

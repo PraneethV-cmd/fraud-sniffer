@@ -40,7 +40,6 @@ CREATE TABLE assignmentsinfo (
   assignmentInfoID SERIAL PRIMARY KEY,
   assignmentID INT NOT NULL,
   userID INT NOT NULL,
-  status TEXT CHECK (status IN ('IN_PROGRESS', 'COMPLETED', 'PENDING')),
   joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (assignmentID) REFERENCES assignments(assignmentID) ON DELETE CASCADE ON UPDATE CASCADE,
   FOREIGN KEY (userID) REFERENCES users(userID) ON DELETE CASCADE ON UPDATE CASCADE
@@ -88,16 +87,16 @@ INSERT INTO assignments (userID, title, description, startDate, endDate, difficu
 
 
 -- Insert Assignments Info (Users participating in each other's assignments)
-INSERT INTO assignmentsinfo (assignmentID, userID, status) VALUES
-(1, 2, 'IN_PROGRESS'), 
-(1, 3, 'COMPLETED'),
-(2, 1, 'IN_PROGRESS'),
-(2, 4, 'COMPLETED'),
-(3, 5, 'PENDING'),
-(4, 1, 'IN_PROGRESS'),
-(4, 3, 'IN_PROGRESS'),
-(5, 2, 'COMPLETED'),
-(5, 4, 'PENDING');
+INSERT INTO assignmentsinfo (assignmentID, userID) VALUES
+(1, 2), 
+(1, 3),
+(2, 1),
+(2, 4),
+(3, 5),
+(4, 1),
+(4, 3),
+(5, 2),
+(5, 4);
 
 -- Insert Submissions (Users submitting their work)
 INSERT INTO submissions (assignmentInfoID) VALUES

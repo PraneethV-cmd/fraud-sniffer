@@ -1,14 +1,6 @@
 const path = require("path");
 const fs = require("fs");
 
-
-const uploadDir = path.join(__dirname, "../uploads");
-
-// Ensure upload directory exists
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-}
-
 const response = {
     fileName: undefined,
     filePath: undefined,
@@ -18,7 +10,9 @@ const response = {
     }
 }
 
-const fileModel = async(fileName) => {
+const fileModel = async(fileName, folderPath) => {
+    const uploadDir = path.join(__dirname, `../uploads${folderPath !== "root" ? `/${folderPath}` : ""}`);
+
     const filePath = path.join(uploadDir, fileName);
     
     if (fs.existsSync(filePath)) {
