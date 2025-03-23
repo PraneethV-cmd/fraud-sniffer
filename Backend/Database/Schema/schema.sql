@@ -71,11 +71,11 @@ CREATE TABLE plagiarism_reports (
 
 -- Insert Users details.
 INSERT INTO users (userName, password, email) VALUES
-('user1', '$2b$10$KMyMEvTkDcbx/RYToDC6J.hOBvUmvYHisEQ1IuTWMRHTgbHUvcDc2', 'alice@example.com'),
-('user2', 'user2', 'bob@example.com'),
-('user3', 'user3', 'charlie@example.com'),
-('user4', 'user4', 'david@example.com'),
-('user5', 'user5', 'emma@example.com');
+('user1', '$2b$10$KMyMEvTkDcbx/RYToDC6J.hOBvUmvYHisEQ1IuTWMRHTgbHUvcDc2', 'user1@gmail.com'),
+('user2', '$2b$10$04/FozkgIXpZ0J9pyMzUcOpklYN4nQyGh/12XiUyKkvYudTLFFrD.', 'user2@gmail.com'),
+('user3', '$2b$10$.MBsgLfokqB6V.K6xTf3QOqTg8MOmXSwy7tdsULse4jb1GeTEpI2G', 'user3@gmail.com'),
+('user4', '$2b$10$PiCMrL/cYhzsNZDGjCU0duG/0KCu1OB48h4fAVbXxkpENPYPkkU1q', 'user4@gmail.com'),
+('user5', '$2b$10$g0JHRzrxpqXK.ZD1YZATw.T6v3fGUiKzq/6bckerem6XaICJtetbi', 'user5@gmail.com');
 
 -- Insert Assignments with Default File Information
 INSERT INTO assignments (userID, title, description, startDate, endDate, difficulty, status, join_code) VALUES

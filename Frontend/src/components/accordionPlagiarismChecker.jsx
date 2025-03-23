@@ -56,21 +56,83 @@ export default function AccordionPlagiarismChecker({ assignment, index }) {
     setSubmissionDialogOpen(true);
   };
 
-  const handleCheckPlagiarism = () => {
-    const submittedFile = submissions.filter((submission) => submission.submissionfilename !== "no_file");
-    if(submittedFile.length <= 0){
+  const handleCheckPlagiarism = async () => {
+    const submittedFile = submissions.filter(submission => submission.submissionfilename !== "no_file");
+
+    if (submittedFile.length <= 0) {
       alert("No submissions found for this assignment!");
       return;
-    }else if(submittedFile.length === 1){
-      alert("Only one submission found. Plagiarism check requires atleast 2 submissions!");
+    } else if (submittedFile.length === 1) {
+      alert("Only one submission found. Plagiarism check requires at least 2 submissions!");
       return;
     }
+
     console.log("Checking Plagiarism for assignment: ", assignmentData.assignmentid);
-    
-    // Use window.open() to open the Flask route in a new tab
-    const url = `http://127.0.0.1:5000/?uploadFolder=../Backend/uploads/${assignmentData.assignmentid}`;
-    window.open(url, "_blank");
-  }
+
+    // Open result page in a new tab
+    const plagiarismUrl = `http://127.0.0.1:5000/?uploadFolder=../Backend/uploads/${assignmentData.assignmentid}`;
+    window.open(plagiarismUrl, "_blank");
+
+    try {
+      const response = await fetch(plagiarismUrl, {
+        headers: { "Accept": "application/json" },
+      });
+      const resultData = await response.json();
+      
+      if (response.ok) {
+        console.log("Plagiarism Results:", resultData);
+        
+        // Send plagiarism results to backend to store in DB
+        // await fetch("http://127.0.0.1:5000/update_plagiarism", {
+        //   method: "POST",
+        //   headers: { "Content-Type": "application/json" },
+        //   body: JSON.stringify({
+        //     assignment_id: assignmentData.assignmentid,
+        //     plagiarism_results: resultData.results,
+        //   }),
+        // });
+
+        // Update state to show plagiarism scores in table
+        setAssignmentData(prevData => {
+          const similarityMap = {};
+
+          // Compute similarity scores for each file
+          resultData.internal_similarities.forEach(({ file1, file2, similarity }) => {
+            if (!similarityMap[file1]) similarityMap[file1] = [];
+            if (!similarityMap[file2]) similarityMap[file2] = [];
+
+            similarityMap[file1].push(similarity);
+            similarityMap[file2].push(similarity);
+          });
+
+          // Calculate average similarity per file
+          const averageSimilarityScores = Object.fromEntries(
+            Object.entries(similarityMap).map(([filename, scores]) => [
+              filename,
+              scores.length > 0 ? scores.reduce((sum, s) => sum + s, 0) / scores.length : 0
+            ])
+          );
+
+          return {
+            ...prevData,
+            plagiarism_results: resultData.results.map(res => ({
+              filename: res.filename,
+              ai_score: (res.ai_score * 100).toFixed(2),  // Convert to percentage
+              similarity_scores: res.plagiarism_results,
+              average_similarity: (averageSimilarityScores[res.filename] * 100 || 0).toFixed(2) // Ensure valid percentage
+            })),
+          };
+        });
+
+
+      } else {
+        alert("Error fetching plagiarism results!");
+      }
+    } catch (error) {
+      console.error("Error checking plagiarism:", error);
+      alert("Failed to fetch plagiarism data.");
+    }
+  };
 
   return (
     <div>
@@ -137,36 +199,49 @@ export default function AccordionPlagiarismChecker({ assignment, index }) {
                     <TableCell><b>Participant Name</b></TableCell>
                     <TableCell><b>Submission Date</b></TableCell>
                     <TableCell><b>File</b></TableCell>
+                    <TableCell><b>AI Plagiarism Score</b></TableCell>
+                    <TableCell><b>Plagiarism Score</b></TableCell>
                     <TableCell><b>Status</b></TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {submissions.map((submission) => (
-                    <TableRow key={submission.submissionid}>
-                      <TableCell>{submission.participantid}</TableCell>
-                      <TableCell>{submission.participantname}</TableCell>
-                      <TableCell>
-                        {submission.submissiondate
-                          ? new Date(submission.submissiondate).toLocaleString()
-                          : "Not Submitted"}
-                      </TableCell>
-                      <TableCell>
-                        {submission.submissionfilename !== "no_file" ? (
-                          <a
-                            href={`http://localhost:8080/api/download/${submission.submissionfilename}?path=${assignmentData.assignmentid}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            {submission.submissionoriginalfilename}
-                          </a>
-                        ) : (
-                          "No File"
-                        )}
-                      </TableCell>
-                      <TableCell>{submission.submissionstatus}</TableCell>
-                    </TableRow>
-                  ))}
+                  {submissions.map((submission) => {
+                    const plagiarismData = assignmentData.plagiarism_results?.find(res => res.filename === submission.submissionfilename);
+                    return (
+                      <TableRow key={submission.submissionid}>
+                        <TableCell>{submission.participantid}</TableCell>
+                        <TableCell>{submission.participantname}</TableCell>
+                        <TableCell>
+                          {submission.submissiondate
+                            ? new Date(submission.submissiondate).toLocaleString()
+                            : "Not Submitted"}
+                        </TableCell>
+                        <TableCell>
+                          {submission.submissionfilename !== "no_file" ? (
+                            <a
+                              href={`http://localhost:8080/api/download/${submission.submissionfilename}?path=${assignmentData.assignmentid}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              {submission.submissionoriginalfilename}
+                            </a>
+                          ) : (
+                            "No File"
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {plagiarismData ? `${plagiarismData.ai_score}%` : "Pending"}
+                        </TableCell>
+
+                        <TableCell>
+                          {plagiarismData ? `${plagiarismData.average_similarity}%` : "Pending"}
+                        </TableCell>
+                        <TableCell>{submission.submissionstatus}</TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
+
               </Table>
             </TableContainer>
           ) : (

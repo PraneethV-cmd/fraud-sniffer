@@ -126,19 +126,20 @@ def generate_pdf(results, internal_similarities):
     # Build the PDF
     doc.build(elements)
     return pdf_path
+
 @app.route("/", methods=["GET"])
 def index():
-    UPLOAD_FOLDER = request.args.get('uploadFolder')  # Use query parameter
+    UPLOAD_FOLDER = request.args.get('uploadFolder')
     if UPLOAD_FOLDER:
         results = []
         files = [f for f in os.listdir(UPLOAD_FOLDER) if f.endswith((".pdf", ".docx", ".txt"))]
-        file_texts = {}  # Store file contents for internal similarity check
+        file_texts = {}
 
         for file in files:
             file_path = os.path.join(UPLOAD_FOLDER, file)
             text = read_file(file_path)
-            file_texts[file] = text  # Store text for later similarity check
-            
+            file_texts[file] = text  
+
             ai_score = check_ai_generated(text)
             web_results = google_search_check(text)
             similarity_scores = check_text_similarity(text, web_results)
@@ -149,15 +150,14 @@ def index():
                 "plagiarism_results": similarity_scores
             })
 
-        # Sort results by AI score in descending order
         results.sort(key=lambda x: x["ai_score"], reverse=True)
-
-        # Check similarity between uploaded files
         internal_similarities = check_internal_similarity(file_texts)
 
-        pdf_path = generate_pdf(results, internal_similarities)
+        # Return JSON if API call, else render HTML
+        if request.headers.get("Accept") == "application/json":
+            return jsonify({"results": results, "internal_similarities": internal_similarities})
 
-        # Render the HTML result page
+        pdf_path = generate_pdf(results, internal_similarities)
         return render_template(
             "result.html",
             results=results,
@@ -165,8 +165,8 @@ def index():
             pdf_path=pdf_path
         )
 
-    # Default landing page
     return render_template("index.html")
+
 
 def check_internal_similarity(file_texts):
     """Compare similarity between uploaded files using TF-IDF."""
