@@ -24,6 +24,7 @@ const Register = async (userName, email, password) => {
         const userResults = await dbPool.query(fetchUserQuery, [userName, email]);
         if (userResults.rowCount >= 1) throw new Error("Username Already Exists");
         const hashedPassword = await hashPassword(password)
+        console.log(password," ",hashedPassword);
         const insertUserQuery = `
         INSERT INTO users 
         (userName, email, password)
