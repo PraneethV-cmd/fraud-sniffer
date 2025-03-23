@@ -38,7 +38,7 @@ const Register = async (userName, email, password) => {
         response.code = 200;
         response.body.message = "Successfully registered user";
     } catch (error) {
-        response.code = error.message === "User Already Exists" ? 409 : 500;
+        response.code = error.message === "Username Already Exists" ? 409 : 500;
         response.body.message = error.message;
         console.error("[ERROR in LoginModel]:", error);
     }
