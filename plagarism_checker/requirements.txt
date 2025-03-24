@@ -1,0 +1,11 @@
+Flask
+flask-cors
+torch
+transformers
+googlesearch-python
+beautifulsoup4
+scikit-learn
+pdfminer.six
+python-docx
+reportlab
+requests
