@@ -4,18 +4,14 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 
-const multer = require("multer");
 const fs = require("fs");
-const stringSimilarity = require("string-similarity");
-const natural = require("natural");
+const path = require("path");
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const mainRouter = require("./mainRouter");
-const upload = multer({ dest: "uploads/" });
-const pool = require("./Database/createPool");
 
 const { initDB } = require("./Database/initDB");
 
@@ -34,6 +30,26 @@ app.use("/api", mainRouter);
 app.use("/test", (req, res)=>{
     res.send("Hello World");
 });
+
+
+const uploadsDir = path.join(__dirname, "uploads");
+
+// Delete the uploads directory if it exists
+if (fs.existsSync(uploadsDir)) {
+  fs.rmSync(uploadsDir, { recursive: true, force: true });
+}
+// Create a new uploads directory
+fs.mkdirSync(uploadsDir, { recursive: true });
+
+/*
+
+const multer = require("multer");
+const fs = require("fs");
+const stringSimilarity = require("string-similarity");
+const natural = require("natural");
+const pool = require("./Database/createPool");
+
+const upload = multer({ dest: "uploads/" });
 
 // Function to Read File Content
 const readFile = (filePath) => fs.readFileSync(filePath, "utf8");
@@ -83,6 +99,8 @@ app.post("/compare", upload.array("files", 2), async (req, res) => {
     fs.unlinkSync(req.files[0].path);
     fs.unlinkSync(req.files[1].path);
 });
+
+*/
 
 app.listen(process.env.PORT, () => {
     console.log("Server is running on port " + process.env.PORT);
