@@ -36,7 +36,18 @@ router.post("/create", upload.single("assignment"), async (req, res) => {
 });
 
 
-router.post("/:assignmentID/submit", upload.single("assignment"), manageAssignmentsController.submit);
+router.post("/:assignmentID/submit",
+    (req, res, next) => {
+        upload.single("assignment")(req, res, function (err) {
+            if (err) {
+                return next(err); // Pass multer error to the error-handling middleware
+            }
+            next();
+        });
+    },
+    manageAssignmentsController.submit
+);
+
 // router.get("/view/:id", manageAssignmentsController.downloadFile); - Created an alternative route download/filename
 
 router.post("/join", manageAssignmentsController.joinAssignment);

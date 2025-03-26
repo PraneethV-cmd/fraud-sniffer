@@ -175,7 +175,7 @@ export default function ViewAssignmentsAccordion({ index, assignment }) {
       </Accordion>
 
       {/* Upload Assignment Dialog */}
-      <FormDialogSubmitAssignment open={open} onClose={() => setOpen(false)} assignmentID={assignment.assignmentid} />
+      <FormDialogSubmitAssignment open={open} onClose={() => setOpen(false)} assignment={assignment} />
     </div>
   );
 }

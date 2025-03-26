@@ -5,6 +5,7 @@ const app = express();
 const cors = require("cors");
 
 const fs = require("fs");
+const multer = require("multer");
 const path = require("path");
 
 app.use(cors());
@@ -31,6 +32,15 @@ app.use("/test", (req, res)=>{
     res.send("Hello World");
 });
 
+app.use((err, req, res, next) => {
+    console.error("Error:", err.message);
+
+    if (err instanceof multer.MulterError) {
+        return res.status(400).json({ error: `Multer error: ${err.message}` });
+    }
+
+    res.status(400).json({ error: err.message || "Something went wrong!" });
+});
 
 const uploadsDir = path.join(__dirname, "uploads");
 

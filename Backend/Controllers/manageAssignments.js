@@ -146,11 +146,17 @@ const manageAssignmentsController = {
 
     submit: async (req, res) => {
         try {
+            // Check if a Multer error occurred
+            if (req.multerError) {
+                return res.status(400).json({ error: req.multerError });
+            }
+
+            // Check if no file was uploaded
             if (!req.file) {
                 return res.status(400).json({ error: "No file uploaded" });
             }
-            const assignmentID = req.params.assignmentID;
 
+            const assignmentID = req.params.assignmentID;
             const { userID } = JSON.parse(req.body.otherfields);
 
             const fileInfo = {
@@ -164,9 +170,7 @@ const manageAssignmentsController = {
 
             const response = await manageAssignmentsModel.submit(userID, assignmentID, fileInfo);
 
-            res.status(response.code).json({
-                message: response.body.message
-            });
+            res.status(response.code).json(response.body);
         } catch (err) {
             console.error("Upload error:", err);
             res.status(500).json({ error: "File upload error" });

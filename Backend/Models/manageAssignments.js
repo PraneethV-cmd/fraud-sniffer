@@ -261,7 +261,7 @@ const manageAssignmentsModel = {
     },
 
     submit: async(userID, assignmentID, file) => {
-        const currDate = new Date();
+        const submissionDate = new Date();
         try{
             const getAssignmentInfo = await dbPool.query(`
                 SELECT * 
@@ -286,10 +286,16 @@ const manageAssignmentsModel = {
             WHERE assignmentInfoID = $1;
             `;
     
-            await dbPool.query(query, [assignmentInfoID, file.filename, file.originalFilename, file.filePath, file.fileType, file.fileSize, file.isZip, currDate, 'SUBMITTED']);
+            await dbPool.query(query, [assignmentInfoID, file.filename, file.originalFilename, file.filePath, file.fileType, file.fileSize, file.isZip, submissionDate, 'SUBMITTED']);
 
             response.code = 201;
             response.body.message = "Assignment Submitted Successfully."
+            response.body.submission = {
+                filePath: file.filePath,
+                filename: file.filename,
+                originalFilename: file.originalFilename,
+                submissionDate: submissionDate
+            };
         } catch (error) {
             response.code = 500;
             response.body.message = error.message;

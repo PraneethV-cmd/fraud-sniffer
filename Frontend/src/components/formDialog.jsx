@@ -158,7 +158,8 @@ export function FormDialogEditAssignment({ open, onClose, assignment, onSave }) 
 }
 
 
-export function FormDialogSubmitAssignment({ open, onClose, assignmentID }) {
+export function FormDialogSubmitAssignment({ open, onClose, assignment }) {
+  const assignmentID = assignment.assignmentid;
   const [file, setFile] = React.useState(null);
 
   const handleFileChange = (event) => {
@@ -185,9 +186,18 @@ export function FormDialogSubmitAssignment({ open, onClose, assignmentID }) {
 
       if (response.ok) {
         alert("Assignment submitted successfully!");
+        assignment.submissionstatus = "SUBMITTED";
+        const res = await response.json();
+        const { filePath, filename, originalFilename, submissionDate } = res.submission;
+        assignment.submissionfilepath = filePath;
+        assignment.submissionfilename = filename;
+        assignment.submissionoriginalfilename = originalFilename;
+        assignment.submissiondate = submissionDate;
+
         onClose();
       } else {
-        alert("Failed to submit assignment.");
+        const err = await response.json();
+        alert(`Error : ${err.error}`);
       }
     } catch (error) {
       console.error("Upload error:", error);
