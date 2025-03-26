@@ -22,7 +22,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { FormDialogEditAssignment } from "./formDialog";
 
-export default function AccordionUsage({ assignment, index }) {
+export default function AccordionUsage({ assignment, index, onDelete }) {
   const {
     title,
     description,
@@ -81,6 +81,7 @@ export default function AccordionUsage({ assignment, index }) {
       .then((response) => {
         if (!response.ok) throw new Error("Failed to delete assignment");
         console.log("Assignment deleted successfully!");
+        onDelete(assignment.assignmentid);
       })
       .catch((error) => console.error("Error deleting assignment:", error));
 

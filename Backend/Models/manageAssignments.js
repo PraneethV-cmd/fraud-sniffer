@@ -53,7 +53,7 @@ const manageAssignmentsModel = {
         return response;
     },
 
-    update: async (assignmentID, title, description, startDate, endDate, difficulty) => {
+    update: async (assignmentID, title, description, startdate, enddate, difficulty) => {
 
         const query = `
         UPDATE assignments
@@ -62,7 +62,7 @@ const manageAssignmentsModel = {
         RETURNING *;`;
 
         try {
-            const results = await dbPool.query(query, [title, description, startDate, endDate, difficulty, assignmentID]);
+            const results = await dbPool.query(query, [title, description, startdate, enddate, difficulty, assignmentID]);
             if (results.rowCount === 0) throw new Error("Update failed");
 
             response.code = 200;
@@ -247,17 +247,17 @@ const manageAssignmentsModel = {
                 INSERT INTO submissions (assignmentInfoID)
                 VALUES ($1);
                 `, [assignmentinfoid])
-
-            response.code = 200;
-            response.body.message = `Successfully joined assignment\nAssignment ID: ${assignmentid}\nUser ID: ${userID}\nStatus: ${joinResult.rows[0].status}`;
+            
+            
+            return manageAssignmentsModel.view(userID, "participant");
 
         } catch (error) {
             response.code = 500;
             response.body.message = error.message;
             console.error("[ERROR in manageAssignmentsModel.joinAssignment]:", error);
+            return response;
         }
 
-        return response;
     },
 
     submit: async(userID, assignmentID, file) => {

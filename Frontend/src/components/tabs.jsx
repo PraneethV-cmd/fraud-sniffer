@@ -52,6 +52,7 @@ export default function ColorTabs() {
       return response.json();
     })
     .then((data) => {
+      setAssignmentList(data);
       setSnackbarMessage("Successfully joined the assignment!");
       setSnackbarOpen(true);
     })
@@ -111,6 +112,13 @@ export default function ColorTabs() {
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
+  };
+
+  // Function to delete an assignment from state
+  const handleDeleteAssignment = (assignmentId) => {
+    setManagableAssignments((prevAssignments) =>
+      prevAssignments.filter((assignment) => assignment.assignmentid !== assignmentId)
+    );
   };
 
   return (
@@ -285,7 +293,7 @@ export default function ColorTabs() {
           ) : managableAssignments.length > 0 ? (
             <>
               {managableAssignments.map((assignment, index) => (
-                <AccordionUsage key={`manage_assignments-${assignment.assignmentid}`} index={index} assignment={assignment} />
+                <AccordionUsage key={`manage_assignments-${assignment.assignmentid}`} index={index} assignment={assignment} onDelete={handleDeleteAssignment} />
               ))}
             </>
           ) : (

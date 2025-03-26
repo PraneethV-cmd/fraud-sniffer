@@ -62,14 +62,14 @@ const manageAssignmentsController = {
     update: async (req, res) => {
         try {
             const assignmentID = req.params.assignmentID;
-            const { startDate, endDate, title, description, difficulty } = req.body;
+            const { startdate, enddate, title, description, difficulty } = req.body;
 
             const response = await manageAssignmentsModel.update(
                 assignmentID,
                 title,
                 description,
-                startDate,
-                endDate,
+                startdate,
+                enddate,
                 difficulty
             );
 
@@ -211,7 +211,6 @@ const manageAssignmentsController = {
                 return res.status(result.code).json({ error: result.body.message });
             }
 
-            console.log(`[LOG]: user ${userID} joined assignment ${joinCode}, ${result.body.message}`);
             return res.status(result.code).json(result.body.message);
         } catch (err) {
             console.error("[ERROR] Join assignment error:", err);

@@ -35,8 +35,8 @@ export function FormDialogEditAssignment({ open, onClose, assignment, onSave }) 
     title: assignment?.title || "",
     description: assignment?.description || "",
     difficulty: assignment?.difficulty || "Medium",
-    startDate: formatDate(assignment?.startdate),
-    endDate: formatDate(assignment?.enddate),
+    startdate: formatDate(assignment.startdate),
+    enddate: formatDate(assignment.enddate),
   });
 
 
@@ -64,18 +64,14 @@ export function FormDialogEditAssignment({ open, onClose, assignment, onSave }) 
       })
       .then((data) => {
         console.log("Assignment updated successfully", data);
+        onSave(formData); 
       })
       .catch((error) => {
         console.error("Error updating assignment:", error);
       });
-
-
-
-    } catch (error) {
-      
+    } finally{
+      onClose(); // Closes the dialog
     }
-    onSave(formData); // Calls the onSave function with updated data
-    onClose(); // Closes the dialog
   };
   
 
@@ -126,9 +122,9 @@ export function FormDialogEditAssignment({ open, onClose, assignment, onSave }) 
           <TextField
             margin="dense"
             label="Start Date"
-            name="startDate"
+            name="startdate"
             type="datetime-local"
-            value={formData.startDate}
+            value={formData.startdate}
             onChange={handleChange}
             required
             style={{padding:"0.05rem"}}
@@ -137,9 +133,9 @@ export function FormDialogEditAssignment({ open, onClose, assignment, onSave }) 
           <TextField
             margin="dense"
             label="End Date"
-            name="endDate"
+            name="enddate"
             type="datetime-local"
-            value={formData.endDate}
+            value={formData.enddate}
             onChange={handleChange}
             required
             style={{padding:"0.05rem"}}
