@@ -1,10 +1,12 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useContext } from "react";
 import { Box, Button, TextField, Typography, MenuItem, Dialog, DialogActions, DialogContent, DialogTitle, CircularProgress } from "@mui/material";
 import JSZip from "jszip";
+import { Context } from "../context/context";
 
 const difficulties = ["Easy", "Medium", "Hard"];
 
 export default function CreateAssignmentForm() {
+  const { setManagableAssignments } = useContext(Context);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -67,6 +69,9 @@ export default function CreateAssignmentForm() {
       });
 
       if (response.ok) {
+        const newAssignment = await response.json();
+        console.log("New Assignment:", newAssignment);
+        setManagableAssignments(newAssignment);
         setPopupMessage("✅ Assignment uploaded successfully!");
         setFiles([]);
       } else {

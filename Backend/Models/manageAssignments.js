@@ -1,7 +1,7 @@
 const dbPool = require("../Database/createPool");
 const { v4: uuidv4 } = require("uuid");
 
-const cryptoRandomString = require('crypto-random-string').default;
+const cryptoRandomString = require('crypto-random-string');
 
 
 const response = {
@@ -36,14 +36,13 @@ const manageAssignmentsModel = {
 
         const query = `
         INSERT INTO assignments (userID, title, description, startDate, endDate, difficulty, filename, originalFilename, filePath, fileType, fileSize, isZip, join_code)
-        VALUES ($1, $2, $3, $4, $5, $6, COALESCE($7, 'no_file'), COALESCE($8, 'no_file'), COALESCE($9, ''), COALESCE($10, 'unknown'), COALESCE($11, 0), COALESCE($12, FALSE), $13)
-        RETURNING *;`;
+        VALUES ($1, $2, $3, $4, $5, $6, COALESCE($7, 'no_file'), COALESCE($8, 'no_file'), COALESCE($9, ''), COALESCE($10, 'unknown'), COALESCE($11, 0), COALESCE($12, FALSE), $13);
+        `;
 
         try {
             const paramsWithJoinCode = [...params, joinCode];
-            const results = await dbPool.query(query, paramsWithJoinCode);
-            response.code = 201;
-            response.body.message = results.rows[0];
+            await dbPool.query(query, paramsWithJoinCode);
+            return manageAssignmentsModel.view(paramsWithJoinCode[0], "owner");
         } catch (error) {
             response.code = 500;
             response.body.message = error.message;
@@ -307,4 +306,3 @@ const manageAssignmentsModel = {
 };
 
 module.exports = manageAssignmentsModel;
-

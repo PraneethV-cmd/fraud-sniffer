@@ -64,7 +64,6 @@ export default function AccordionUsage({ assignment, index, onDelete }) {
   // Handle save after editing
   const handleSave = (updatedData) => {
     setAssignmentData((prev) => ({ ...prev, ...updatedData }));
-    console.log("Updated Assignment:", updatedData);
   };
 
   // Open delete confirmation dialog

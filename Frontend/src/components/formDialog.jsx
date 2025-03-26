@@ -63,7 +63,6 @@ export function FormDialogEditAssignment({ open, onClose, assignment, onSave }) 
         return response.json();
       })
       .then((data) => {
-        console.log("Assignment updated successfully", data);
         onSave(formData); 
       })
       .catch((error) => {
