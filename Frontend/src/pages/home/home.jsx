@@ -42,8 +42,8 @@ const Home = () => {
 
         // Merge submission details into ownerData
         const ownerDataWithSubmissions = ownerData.map(ownerAssignment => {
-        // Find all submissions for this assignment
-        const submissions = submissionData.filter(sub => sub.assignmentid === ownerAssignment.assignmentid);
+          // Find all submissions for this assignment
+          const submissions = submissionData.filter(sub => sub.assignmentid === ownerAssignment.assignmentid);
           return { ...ownerAssignment, submissions }; // Add submissions array to assignment
         });
 
@@ -60,12 +60,12 @@ const Home = () => {
       });
   }, []);
 
-  useEffect(()=> {
-    if(activeTab == "Plagiarism Check"){
+  useEffect(() => {
+    if (activeTab == "Plagiarism Check") {
       setValue("Check Plagiarism");
-    }else if(activeTab == "Home"){
+    } else if (activeTab == "Home") {
       setValue("View Assignments");
-    }else if(activeTab == "Assignments"){
+    } else if (activeTab == "Assignments") {
       setValue("Manage Assignments");
     }
   }, [activeTab]);
@@ -92,6 +92,56 @@ const Home = () => {
           {activeTab === "Profile" && <Profile />}  
         </div>
       </div>
+
+      <style jsx>{`
+        .main-container {
+          display: flex;
+          min-height: 100vh;
+          background: linear-gradient(180deg, #f0f4f8 0%, #d9e2ec 100%);
+          padding: 20px;
+          border-radius: 15px;
+          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+          transition: all 0.3s ease-in-out;
+        }
+
+        .main-container:hover {
+          box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+          transform: translateY(-5px);
+        }
+
+        .sidebar {
+          position: relative;
+          padding: 15px;
+          background: linear-gradient(135deg, #4a00e0 0%, #8e2de2 100%); /* Vibrant purple gradient */
+          border-radius: 12px;
+          backdrop-filter: blur(10px); /* Retains the frosted glass effect */
+          box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2); /* Slightly stronger shadow for depth */
+          border: 1px solid rgba(255, 255, 255, 0.5); /* Brighter border for contrast */
+          transition: all 0.3s ease;
+        }
+
+        @keyframes glow {
+          0% { box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2); }
+          50% { box-shadow: 0 6px 25px rgba(142, 45, 226, 0.5); } /* Purple glow */
+          100% { box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2); }
+        }
+
+        .sidebar:hover {
+          background:linear-gradient(135deg, #5b0fff 0%, #9b3fff 100%);
+          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+          transform: scale(1.02);
+        }
+
+        /* Optional: Add a subtle animation */
+        @keyframes slideIn {
+          0% { transform: translateX(-20px); opacity: 0; }
+          100% { transform: translateX(0); opacity: 1; }
+        }
+
+        .sidebar {
+          animation: glow 2s infinite ease-in-out; /* Continuous subtle glow effect */
+        }
+      `}</style>
     </div>
   );
 };
