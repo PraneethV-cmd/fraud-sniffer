@@ -15,7 +15,7 @@ export default function ColorTabs() {
     value, setValue,
     assignmentList, setAssignmentList,
     managableAssignments, setManagableAssignments,
-    loading, setLoading
+    loading
   } = useContext(Context);
 
   const [openJoinDialog, setOpenJoinDialog] = useState(false);
@@ -63,52 +63,6 @@ export default function ColorTabs() {
 
     handleCloseJoinDialog();
   };
-
-
-  useEffect(() => {
-    const userID = sessionStorage.getItem("userID");
-    setLoading(true);
-
-    Promise.all([
-      fetch(`http://localhost:8080/api/assignment/view?userID=${userID}&type=participant`, {
-        method: "GET",
-        headers: { 
-          "Content-Type": "application/json" 
-        },
-      }).then((response) => response.json()),
-
-      fetch(`http://localhost:8080/api/assignment/view?userID=${userID}&type=owner`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      }).then((response) => response.json()),
-
-      fetch(`http://localhost:8080/api/assignment/view?userID=${userID}&type=getSubmissions`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      }).then((response) => response.json()),
-    ])
-      .then(([participantData, ownerData, submissionData]) => {
-        console.log("Participant:", participantData);
-
-        // Merge submission details into ownerData
-        const ownerDataWithSubmissions = ownerData.map(ownerAssignment => {
-        // Find all submissions for this assignment
-        const submissions = submissionData.filter(sub => sub.assignmentid === ownerAssignment.assignmentid);
-          return { ...ownerAssignment, submissions }; // Add submissions array to assignment
-        });
-
-        console.log("Owner Data:", ownerDataWithSubmissions);
-
-        setAssignmentList(participantData);
-        setManagableAssignments(ownerDataWithSubmissions);
-      })
-      .catch((err) => {
-        console.error("Error fetching assignments:", err);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);

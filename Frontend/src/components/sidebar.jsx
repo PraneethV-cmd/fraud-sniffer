@@ -1,4 +1,4 @@
-import React, { use, useState } from "react";
+import React, { useState } from "react";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import Button from "@mui/material/Button";
@@ -19,7 +19,7 @@ const menuItems = [
   { text: "Logout", icon: faSignOutAlt }
 ];
 
-export default function CustomDrawer() {
+export default function CustomDrawer({ onMenuClick }) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -28,11 +28,11 @@ export default function CustomDrawer() {
   };
 
   const handleMenuClick = (e) => {
-    console.log(e);
     if(e.target.innerText == "Logout"){
       sessionStorage.clear();
       navigate("/login");
     }
+    onMenuClick(e.target.innerText);
   };
 
   const DrawerList = (
