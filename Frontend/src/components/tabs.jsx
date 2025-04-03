@@ -92,8 +92,8 @@ export default function ColorTabs() {
 
         // Merge submission details into ownerData
         const ownerDataWithSubmissions = ownerData.map(ownerAssignment => {
-          // Find all submissions for this assignment
-          const submissions = submissionData.filter(sub => sub.assignmentid === ownerAssignment.assignmentid);
+        // Find all submissions for this assignment
+        const submissions = submissionData.filter(sub => sub.assignmentid === ownerAssignment.assignmentid);
           return { ...ownerAssignment, submissions }; // Add submissions array to assignment
         });
 

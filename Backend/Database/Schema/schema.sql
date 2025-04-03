@@ -11,7 +11,8 @@ CREATE TABLE users (
   userID SERIAL PRIMARY KEY,
   userName VARCHAR(255) NOT NULL,
   password VARCHAR(255) NOT NULL, -- Support for hashed passwords
-  email VARCHAR(255) NOT NULL UNIQUE
+  email VARCHAR(255) NOT NULL UNIQUE,
+  score INT DEFAULT 1000
 );
 
 -- Create Assignments Table with Secure Join Code
@@ -32,6 +33,7 @@ CREATE TABLE assignments (
   isZip BOOLEAN DEFAULT FALSE,
   uploadDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   join_code TEXT NOT NULL UNIQUE CHECK (LENGTH(join_code) > 5),
+  plagarism_check BOOLEAN DEFAULT FALSE,
   FOREIGN KEY (userID) REFERENCES users(userID) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -57,6 +59,8 @@ CREATE TABLE submissions (
   submissionIsZip BOOLEAN DEFAULT FALSE,
   submissionDate TIMESTAMP,
   submissionStatus VARCHAR(255) NOT NULL DEFAULT 'PENDING',
+  ai_plagiarism_score INT DEFAULT 0,
+  plagiarism_score INT DEFAULT 0,
   FOREIGN KEY (assignmentInfoID) REFERENCES assignmentsinfo(assignmentInfoID) ON DELETE CASCADE
 );
 

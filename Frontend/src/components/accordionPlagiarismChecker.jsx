@@ -19,8 +19,6 @@ import {
   Paper,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import { FormDialogEditAssignment } from "./formDialog";
 
 export default function AccordionPlagiarismChecker({ assignment, index }) {
   const {
@@ -38,8 +36,6 @@ export default function AccordionPlagiarismChecker({ assignment, index }) {
     submissions = [],
   } = assignment;
 
-  const [open, setOpen] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [submissionDialogOpen, setSubmissionDialogOpen] = useState(false); // State for submission popup
   const [assignmentData, setAssignmentData] = useState({
     assignmentid,
@@ -82,16 +78,7 @@ export default function AccordionPlagiarismChecker({ assignment, index }) {
       if (response.ok) {
         console.log("Plagiarism Results:", resultData);
         
-        // Send plagiarism results to backend to store in DB
-        // await fetch("http://127.0.0.1:5000/update_plagiarism", {
-        //   method: "POST",
-        //   headers: { "Content-Type": "application/json" },
-        //   body: JSON.stringify({
-        //     assignment_id: assignmentData.assignmentid,
-        //     plagiarism_results: resultData.results,
-        //   }),
-        // });
-
+        
         // Update state to show plagiarism scores in table
         setAssignmentData(prevData => {
           const similarityMap = {};
@@ -100,30 +87,55 @@ export default function AccordionPlagiarismChecker({ assignment, index }) {
           resultData.internal_similarities.forEach(({ file1, file2, similarity }) => {
             if (!similarityMap[file1]) similarityMap[file1] = [];
             if (!similarityMap[file2]) similarityMap[file2] = [];
-
+            
             similarityMap[file1].push(similarity);
             similarityMap[file2].push(similarity);
           });
-
-          // Calculate average similarity per file
+          
+          // Create an object where each filename has `plagiarism_score` and `ai_score`
           const averageSimilarityScores = Object.fromEntries(
             Object.entries(similarityMap).map(([filename, scores]) => [
               filename,
-              scores.length > 0 ? scores.reduce((sum, s) => sum + s, 0) / scores.length : 0
+              {
+                plagiarism_score: scores.length > 0 ? parseInt((scores.reduce((sum, s) => sum + s, 0) * 100 / scores.length).toFixed(2)) : 0,
+                ai_score: 0,
+              },
             ])
           );
+          
+          // Assign AI scores from resultData
+          resultData.results.forEach(({ filename, ai_score }) => {
+            if (averageSimilarityScores[filename]) {
+              averageSimilarityScores[filename].ai_score = parseInt((ai_score).toFixed(2)); // Convert AI score to percentage
+            }
+          });
+          
+          // Send plagiarism results to backend to store in DB
+          (async () => {
+              try {
+                  await fetch(`http://localhost:8080/api/assignment/update_plagiarism`, {
+                          method: "PUT",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify(averageSimilarityScores),
+                        });
+              } catch (err) {
+                console.error("[ERROR in Updating Plagiarism Scores]: ", err);
+              }
+          })();
+
+
 
           return {
             ...prevData,
             plagiarism_results: resultData.results.map(res => ({
               filename: res.filename,
-              ai_score: (res.ai_score * 100).toFixed(2),  // Convert to percentage
+              
+              ai_score: averageSimilarityScores[res.filename].ai_score,
+              average_similarity: (averageSimilarityScores[res.filename].plagiarism_score || 0), // Ensure valid percentage
               similarity_scores: res.plagiarism_results,
-              average_similarity: (averageSimilarityScores[res.filename] * 100 || 0).toFixed(2) // Ensure valid percentage
             })),
           };
         });
-
 
       } else {
         alert("Error fetching plagiarism results!");

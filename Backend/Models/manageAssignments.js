@@ -75,6 +75,31 @@ const manageAssignmentsModel = {
         return response;
     },
 
+    updateScores: async (plagiarismScore) => {
+        const query = `
+            UPDATE submissions
+            SET ai_plagiarism_score = $1, plagiarism_score = $2
+            WHERE submissionFilename = $3
+        `;
+
+        try {
+            for (const fileName in plagiarismScore) {
+                let { ai_score, plagiarism_score } = plagiarismScore[fileName];
+
+                ai_score = Math.round(parseFloat(ai_score)) || 0;
+                plagiarism_score = Math.round(parseFloat(plagiarism_score)) || 0;
+
+                await dbPool.query(query, [ai_score, plagiarism_score, fileName]);
+            }
+            response.code = 200;
+        } catch (error) {
+            response.code = 500;
+            response.body.message = error.message;
+            console.error("[ERROR in manageAssignmentsModel.updateScores]:", error);
+        }
+        return response;
+    },
+
     delete: async (assignmentID) => {
 
         const query = `DELETE FROM assignments WHERE assignmentID = $1 RETURNING *;`;
@@ -179,12 +204,14 @@ const manageAssignmentsModel = {
                         s.submissionFileType,
                         s.submissionFileSize,
                         s.submissionStatus,
-                        s.submissionDate
+                        s.submissionDate,
+                        s.ai_plagiarism_score,
+                        s.plagiarism_score
                     FROM assignments a
                     INNER JOIN assignmentsinfo ai ON a.assignmentID = ai.assignmentID
-                    INNER JOIN users u ON ai.userID = u.userID -- Get participant details
-                    LEFT JOIN submissions s ON ai.assignmentInfoID = s.assignmentInfoID -- Get submission details
-                    WHERE a.userID = $1  -- Fetch assignments created by the given user
+                    INNER JOIN users u ON ai.userID = u.userID
+                    LEFT JOIN submissions s ON ai.assignmentInfoID = s.assignmentInfoID
+                    WHERE a.userID = $1
                     ORDER BY a.assignmentID, s.submissionDate DESC;
                     `;
             } else {

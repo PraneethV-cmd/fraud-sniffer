@@ -7,9 +7,8 @@ const manageAssignmentsController = require("../Controllers/manageAssignments");
 // router.get("/filter", manageAssignmentsController.filter); 
 
 router.get("/view", manageAssignmentsController.view);
-router.get("/:assignmentID", manageAssignmentsController.get);
-router.put("/:assignmentID", manageAssignmentsController.update);
-router.delete("/:assignmentID", manageAssignmentsController.delete);
+router.post("/join", manageAssignmentsController.joinAssignment);
+router.put("/update_plagiarism", manageAssignmentsController.updateScores);
 
 router.post("/create", upload.single("assignment"), async (req, res) => {
     try {
@@ -48,9 +47,12 @@ router.post("/:assignmentID/submit",
     manageAssignmentsController.submit
 );
 
+router.get("/:assignmentID", manageAssignmentsController.get);
+router.put("/:assignmentID", manageAssignmentsController.update);
+router.delete("/:assignmentID", manageAssignmentsController.delete);
+
 // router.get("/view/:id", manageAssignmentsController.downloadFile); - Created an alternative route download/filename
 
-router.post("/join", manageAssignmentsController.joinAssignment);
 
 module.exports = router;
 
