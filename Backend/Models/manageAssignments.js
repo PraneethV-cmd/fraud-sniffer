@@ -108,6 +108,33 @@ const manageAssignmentsModel = {
         return response;
     },
 
+    updatePersonScore: async (assignmentID, userID) => {
+        const query = `
+            UPDATE users u
+            SET score = score + CASE 
+                WHEN EXISTS (
+                    SELECT 1 FROM submissions s 
+                    WHERE s.userID = u.userID 
+                    AND s.assignmentID = $1
+                    AND (s.ai_plagiarism_score > 50 OR s.plagiarism_score > 50)
+                ) THEN -2
+                ELSE 1
+            END
+            WHERE userID = $2
+        `;
+
+        try {
+            await dbPool.query(query, [assignmentID, userID]);
+            response.code = 200;
+        } catch (error) {
+            response.code = 500;
+            response.body.message = error.message;
+            console.error("[ERROR in manageAssignmentsModel.updatePersonScore]:", error);
+        }
+
+        return response;
+    },
+
     delete: async (assignmentID) => {
 
         const query = `DELETE FROM assignments WHERE assignmentID = $1 RETURNING *;`;

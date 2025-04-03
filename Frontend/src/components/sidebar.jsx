@@ -11,11 +11,11 @@ import { faBars, faHome, faTasks, faClipboardCheck, faBell, faUser, faSignOutAlt
 import { useNavigate } from "react-router-dom";
 
 const menuItems = [
-  { text: "Home", icon: faHome },
+  { text: "Home", icon: faHome, path: "/home" },
   { text: "Assignments", icon: faTasks },
   { text: "Plagiarism Check", icon: faClipboardCheck },
   { text: "Notifications", icon: faBell },
-  { text: "Profile", icon: faUser },
+  { text: "Profile", icon: faUser, path: "/profile" },
   { text: "Logout", icon: faSignOutAlt }
 ];
 
@@ -28,11 +28,17 @@ export default function CustomDrawer() {
   };
 
   const handleMenuClick = (e) => {
-    console.log(e);
-    if(e.target.innerText == "Logout"){
+    const clickedText = e.target.innerText;
+    if (clickedText === "Logout") {
       sessionStorage.clear();
       navigate("/login");
+    } else {
+      const menuItem = menuItems.find(item => item.text === clickedText);
+      if (menuItem && menuItem.path) {
+        navigate(menuItem.path);
+      }
     }
+    setOpen(false);
   };
 
   const DrawerList = (

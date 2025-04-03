@@ -9,6 +9,7 @@ const manageAssignmentsController = require("../Controllers/manageAssignments");
 router.get("/view", manageAssignmentsController.view);
 router.post("/join", manageAssignmentsController.joinAssignment);
 router.put("/update_plagiarism/:assignmentID", manageAssignmentsController.updateScores);
+router.post("/:assignmentID/update_score", manageAssignmentsController.updatePersonScore);
 
 router.post("/create", upload.single("assignment"), async (req, res) => {
     try {
@@ -55,5 +56,3 @@ router.delete("/:assignmentID", manageAssignmentsController.delete);
 
 
 module.exports = router;
-
-

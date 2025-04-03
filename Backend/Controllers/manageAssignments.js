@@ -102,6 +102,20 @@ const manageAssignmentsController = {
         }
     },
 
+    updatePersonScore: async (req, res) => {
+        try {
+            const { assignmentID, userID } = req.body;
+            const response = await manageAssignmentsModel.updatePersonScore(assignmentID, userID);
+            if (!response) {
+                return res.status(500).json({ error: "Update failed" });
+            }
+            res.status(response.code).json(response.body.message);
+        } catch (err) {
+            console.error("Update error:", err);
+            res.status(500).json({ error: "Server error" });
+        }
+    },
+
     delete: async (req, res) => {
         try {
             const assignmentID = req.params.assignmentID;
