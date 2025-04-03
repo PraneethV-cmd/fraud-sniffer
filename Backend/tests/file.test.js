@@ -1,34 +1,40 @@
-const path = require("path");
-const fs = require("fs");
-const fileModel = require("../Models/fileModel");
+const request = require("supertest");
+const express = require("express");
+const fileController = require("../Controllers/fileController");
+const fileModel = require("../Models/fileModel"); 
 
+jest.mock("../Models/fileModel"); // Mocking fileModel
 
-jest.mock("fs");
+const app = express();
+app.get("/download/:filename", fileController);
 
-describe("File Model Tests", () => {
-    const mockFileName = "testFile.txt";
-    const mockFilePath = path.join(__dirname, "../uploads", mockFileName);
+describe("File Controller Tests", () => {
+    test("Should download the file successfully", async () => {
+        const mockFilename = "testfile.txt";
+        const mockPath = "/uploads";
+        const mockResponse = {
+            filePath: "/uploads/testfile.txt",
+            fileName: "testfile.txt",
+        };
 
-    beforeEach(() => {
-        jest.clearAllMocks();
+        fileModel.mockResolvedValue(mockResponse); // Mocking function response
+
+        const response = await request(app).get(`/download/${mockFilename}`).query({ path: mockPath });
+
+        expect(response.status).toBe(200);
+        expect(response.header["content-disposition"]).toContain("attachment");
     });
 
-    test("should return file details when file exists", async () => {
-        fs.existsSync.mockReturnValue(true); // Mock file exists
+    test("Should return 500 error if file download fails", async () => {
+        const mockFilename = "invalidfile.txt";
+        const mockPath = "/invalidpath";
+        const mockError = { body: { message: "File not found" } };
 
-        const response = await fileModel(mockFileName);
+        fileModel.mockResolvedValue(mockError); // Mocking error case
 
-        expect(response.fileName).toBe(mockFileName);
-        expect(response.filePath).toBe(mockFilePath);
-        expect(response.statusCode).toBe(200);
-    });
+        const response = await request(app).get(`/download/${mockFilename}`).query({ path: mockPath });
 
-    test("should return 404 when file does not exist", async () => {
-        fs.existsSync.mockReturnValue(false); // Mock file does not exist
-
-        const response = await fileModel(mockFileName);
-
-        expect(response.statusCode).toBe(404);
-        expect(response.body.message).toBe(`File not found at path:${mockFilePath}`);
+        expect(response.status).toBe(500);
+        expect(response.body).toHaveProperty("error", "Server error");
     });
 });
