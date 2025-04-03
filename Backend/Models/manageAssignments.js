@@ -75,7 +75,7 @@ const manageAssignmentsModel = {
         return response;
     },
 
-    updateScores: async (plagiarismScore) => {
+    updateScores: async (assignmentID, plagiarismScore) => {
         const query = `
             UPDATE submissions
             SET ai_plagiarism_score = $1, plagiarism_score = $2
@@ -91,6 +91,14 @@ const manageAssignmentsModel = {
 
                 await dbPool.query(query, [ai_score, plagiarism_score, fileName]);
             }
+            const checkPlagiarismQuery = `
+            UPDATE assignments
+            set plagarism_check = TRUE
+            where assignmentID = $1;
+            `
+
+            await dbPool.query(checkPlagiarismQuery, [assignmentID]);
+
             response.code = 200;
         } catch (error) {
             response.code = 500;
@@ -313,6 +321,15 @@ const manageAssignmentsModel = {
             `;
     
             await dbPool.query(query, [assignmentInfoID, file.filename, file.originalFilename, file.filePath, file.fileType, file.fileSize, file.isZip, submissionDate, 'SUBMITTED']);
+             
+            // Marking Plagiarism check as false as new file submitted.
+            const checkPlagiarismQuery = `
+            UPDATE assignments
+            set plagarism_check = FALSE
+            where assignmentID = $1;
+            `
+
+            await dbPool.query(checkPlagiarismQuery, [assignmentID]);
 
             response.code = 201;
             response.body.message = "Assignment Submitted Successfully."

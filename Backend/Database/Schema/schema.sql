@@ -59,8 +59,8 @@ CREATE TABLE submissions (
   submissionIsZip BOOLEAN DEFAULT FALSE,
   submissionDate TIMESTAMP,
   submissionStatus VARCHAR(255) NOT NULL DEFAULT 'PENDING',
-  ai_plagiarism_score INT DEFAULT 0,
-  plagiarism_score INT DEFAULT 0,
+  ai_plagiarism_score INT DEFAULT -1,
+  plagiarism_score INT DEFAULT -1,
   FOREIGN KEY (assignmentInfoID) REFERENCES assignmentsinfo(assignmentInfoID) ON DELETE CASCADE
 );
 

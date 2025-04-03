@@ -86,11 +86,12 @@ const manageAssignmentsController = {
 
     updateScores: async (req, res) => {
         try {
+            const assignmentID = req.params.assignmentID;
             const plagiarismScores = req.body;
             if (!plagiarismScores || Object.keys(plagiarismScores).length === 0) {
                 return res.status(400).json({ error: "No plagiarism scores provided" });
             }
-            const response = await manageAssignmentsModel.updateScores(plagiarismScores);
+            const response = await manageAssignmentsModel.updateScores(assignmentID, plagiarismScores);
             if (!response) {
                 return res.status(500).json({ error: "Update failed" });
             }

@@ -20,7 +20,7 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
-export default function AccordionPlagiarismChecker({ assignment, index }) {
+export default function AccordionPlagiarismChecker({ assignment, index, updateAssignment}) {
   const {
     title,
     description,
@@ -34,9 +34,10 @@ export default function AccordionPlagiarismChecker({ assignment, index }) {
     originalfilename,
     join_code,
     submissions = [],
+    plagarism_check
   } = assignment;
 
-  const [submissionDialogOpen, setSubmissionDialogOpen] = useState(false); // State for submission popup
+  const [submissionDialogOpen, setSubmissionDialogOpen] = useState(false);
   const [assignmentData, setAssignmentData] = useState({
     assignmentid,
     title,
@@ -46,6 +47,7 @@ export default function AccordionPlagiarismChecker({ assignment, index }) {
     startdate,
     enddate,
     join_code,
+    plagarism_check
   });
 
   const handleViewSubmissions = () => {
@@ -61,9 +63,10 @@ export default function AccordionPlagiarismChecker({ assignment, index }) {
     } else if (submittedFile.length === 1) {
       alert("Only one submission found. Plagiarism check requires at least 2 submissions!");
       return;
+    } else if (assignmentData.plagarism_check) {
+      alert("Plagiarism check already performed for this assignment!");
+      return;
     }
-
-    console.log("Checking Plagiarism for assignment: ", assignmentData.assignmentid);
 
     // Open result page in a new tab
     const plagiarismUrl = `http://127.0.0.1:5000/?uploadFolder=../Backend/uploads/${assignmentData.assignmentid}`;
@@ -106,14 +109,30 @@ export default function AccordionPlagiarismChecker({ assignment, index }) {
           // Assign AI scores from resultData
           resultData.results.forEach(({ filename, ai_score }) => {
             if (averageSimilarityScores[filename]) {
-              averageSimilarityScores[filename].ai_score = parseInt((ai_score).toFixed(2)); // Convert AI score to percentage
+              averageSimilarityScores[filename].ai_score = parseInt((ai_score).toFixed(2));
             }
           });
           
+          const updatedAssignment = {
+              ...assignment,
+              submissions: assignment.submissions.map(sub => 
+                  averageSimilarityScores[sub.submissionfilename]
+                      ? {
+                          ...sub,
+                          ai_plagiarism_score: averageSimilarityScores[sub.submissionfilename].ai_score,
+                          plagiarism_score: averageSimilarityScores[sub.submissionfilename].plagiarism_score,
+                        }
+                      : sub
+              ),
+          };
+
+
+          updateAssignment(updatedAssignment);
+
           // Send plagiarism results to backend to store in DB
           (async () => {
               try {
-                  await fetch(`http://localhost:8080/api/assignment/update_plagiarism`, {
+                  await fetch(`http://localhost:8080/api/assignment/update_plagiarism/${assignmentData.assignmentid}`, {
                           method: "PUT",
                           headers: { "Content-Type": "application/json" },
                           body: JSON.stringify(averageSimilarityScores),
@@ -124,7 +143,7 @@ export default function AccordionPlagiarismChecker({ assignment, index }) {
           })();
 
 
-
+          assignmentData.plagarism_check = true;
           return {
             ...prevData,
             plagiarism_results: resultData.results.map(res => ({
@@ -218,7 +237,6 @@ export default function AccordionPlagiarismChecker({ assignment, index }) {
                 </TableHead>
                 <TableBody>
                   {submissions.map((submission) => {
-                    const plagiarismData = assignmentData.plagiarism_results?.find(res => res.filename === submission.submissionfilename);
                     return (
                       <TableRow key={submission.submissionid}>
                         <TableCell>{submission.participantid}</TableCell>
@@ -242,11 +260,11 @@ export default function AccordionPlagiarismChecker({ assignment, index }) {
                           )}
                         </TableCell>
                         <TableCell>
-                          {plagiarismData ? `${plagiarismData.ai_score}%` : "Pending"}
+                          {submission.ai_plagiarism_score != -1 ? `${submission.ai_plagiarism_score}%` : "Pending"}
                         </TableCell>
 
                         <TableCell>
-                          {plagiarismData ? `${plagiarismData.average_similarity}%` : "Pending"}
+                          {submission.plagiarism_score != -1 ? `${submission.plagiarism_score}%` : "Pending"}
                         </TableCell>
                         <TableCell>{submission.submissionstatus}</TableCell>
                       </TableRow>

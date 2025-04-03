@@ -121,6 +121,14 @@ export default function ColorTabs() {
     );
   };
 
+  const updateManagebleAssignments = (updatedAssignment) => {
+    setManagableAssignments((prevAssignments) =>
+      prevAssignments.map((assignment) =>
+        assignment.assignmentid === updatedAssignment.assignmentid ? updatedAssignment : assignment
+      )
+    );
+  }
+
   return (
     <Box sx={{ width: "100%", padding: "20px", paddingLeft: "40px" }}>
 
@@ -314,7 +322,7 @@ export default function ColorTabs() {
           ) : managableAssignments.length > 0 ? (
             <>
               {managableAssignments.map((assignment, index) => (
-                <AccordionPlagiarismChecker key={`plagiarism-checker-${assignment.assignmentid}`} index={index} assignment={assignment} />
+                <AccordionPlagiarismChecker key={`plagiarism-checker-${assignment.assignmentid}`} index={index} assignment={assignment} updateAssignment={updateManagebleAssignments}/>
               ))}
             </>
           ) : (

@@ -8,7 +8,7 @@ const manageAssignmentsController = require("../Controllers/manageAssignments");
 
 router.get("/view", manageAssignmentsController.view);
 router.post("/join", manageAssignmentsController.joinAssignment);
-router.put("/update_plagiarism", manageAssignmentsController.updateScores);
+router.put("/update_plagiarism/:assignmentID", manageAssignmentsController.updateScores);
 
 router.post("/create", upload.single("assignment"), async (req, res) => {
     try {
