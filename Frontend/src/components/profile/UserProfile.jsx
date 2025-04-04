@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   Avatar,
   Box,
@@ -13,6 +13,7 @@ import {
   Typography,
   Snackbar,
   Alert,
+  CircularProgress,
 } from "@mui/material"
 import {
   Edit as EditIcon,
@@ -35,6 +36,8 @@ const UserProfile = () => {
   const [editMode, setEditMode] = useState(false)
   const [editedUser, setEditedUser] = useState({ ...userData })
   const [showPassword, setShowPassword] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -111,6 +114,30 @@ const UserProfile = () => {
     setSnackbar({ ...snackbar, open: false })
   }
 
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+        <Typography color="error">{error}</Typography>
+      </Box>
+    );
+  }
+
+  if (!user) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+        <Typography>No profile data available</Typography>
+      </Box>
+    );
+  }
+
   return (
     <Container maxWidth="lg" className="profile-container">
       <Paper elevation={3} className="profile-paper">
@@ -142,7 +169,7 @@ const UserProfile = () => {
                   <Avatar className="profile-avatar">{userData.username}</Avatar>
                 </Box>
                 <Typography variant="h5" component="h2" className="profile-name">
-                  {userData.username}
+                  {user.username} {user.score >= 1000 ? "👼" : "👿"}
                 </Typography>
                 <Typography variant="body1" color="textSecondary" className="profile-email">
                   {userData.email}
@@ -150,11 +177,11 @@ const UserProfile = () => {
                 <Box className="score-container">
                   <BadgeIcon color="primary" />
                   <Typography variant="h6" component="p" className="profile-score">
-                    Score: {userData.score}
+                    Score: {user.score || 0} {user.score >= 1000 ? "👼" : "👿"}
                   </Typography>
                 </Box>
                 <Typography variant="body2" color="textSecondary" className="profile-id">
-                  User ID: {userData.userid}
+                  Email: {user.email}
                 </Typography>
               </CardContent>
             </Card>
@@ -186,7 +213,7 @@ const UserProfile = () => {
                       ) : (
                         <Box className="field-content">
                           <Typography variant="body2" color="textSecondary">
-                            Username
+                            Name
                           </Typography>
                           <Typography variant="body1">{userData.username}</Typography>
                         </Box>
@@ -223,42 +250,17 @@ const UserProfile = () => {
                   <Grid item xs={12}>
                     <Box className="detail-field">
                       <Box className="field-icon">
-                        <LockIcon color="primary" />
-                      </Box>
-                      {editMode ? (
-                        <TextField
-                          fullWidth
-                          label="New Password"
-                          name="password"
-                          type={showPassword ? "text" : "password"}
-                          value={editedUser.password}
-                          onChange={handleInputChange}
-                          variant="outlined"
-                          helperText="Leave unchanged to keep current password"
-                        />
-                      ) : (
-                        <Box className="field-content">
-                          <Typography variant="body2" color="textSecondary">
-                            Password
-                          </Typography>
-                          <Typography variant="body1">••••••••</Typography>
-                        </Box>
-                      )}
-                    </Box>
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <Box className="detail-field">
-                      <Box className="field-icon">
                         <BadgeIcon color="primary" />
                       </Box>
                       <Box className="field-content">
                         <Typography variant="body2" color="textSecondary">
                           Score
                         </Typography>
-                        <Typography variant="body1">{userData.score} points</Typography>
-                        <Typography variant="caption" color="textSecondary">
-                          (Score is calculated based on your activity and cannot be edited directly)
+                        <Typography variant="body1">
+                          {user.score || 0} {user.score >= 1000 ? "👼" : "👿"}
+                          <Typography variant="caption" color="textSecondary" sx={{ ml: 1 }}>
+                            {user.score >= 1000 ? "(Good standing)" : "(Warning: Low score)"}
+                          </Typography>
                         </Typography>
                       </Box>
                     </Box>
@@ -276,7 +278,7 @@ const UserProfile = () => {
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
-        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity}>
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: "100%" }}>
           {snackbar.message}
         </Alert>
       </Snackbar>
