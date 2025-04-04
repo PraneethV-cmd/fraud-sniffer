@@ -76,10 +76,26 @@ const manageAssignmentsModel = {
     },
 
     updateScores: async (assignmentID, plagiarismScore) => {
-        const query = `
+        const updateSubmissionQuery = `
             UPDATE submissions
             SET ai_plagiarism_score = $1, plagiarism_score = $2
             WHERE submissionFilename = $3
+        `;
+
+        const updateUserScoreQuery = `
+            UPDATE users
+            SET score = score + (
+                CASE 
+                    WHEN s.ai_plagiarism_score >= 70 OR s.plagiarism_score >= 70 THEN -2
+                    WHEN s.ai_plagiarism_score >= 50 OR s.plagiarism_score >= 50 THEN -2
+                    WHEN s.ai_plagiarism_score < 30 AND s.plagiarism_score < 30 THEN 1
+                    ELSE 0
+                END
+            )
+            FROM submissions s
+            INNER JOIN assignmentsinfo ai ON s.assignmentInfoID = ai.assignmentInfoID
+            WHERE users.userID = ai.userID
+            AND s.submissionFilename = $1
         `;
 
         try {
@@ -89,8 +105,13 @@ const manageAssignmentsModel = {
                 ai_score = Math.round(parseFloat(ai_score)) || 0;
                 plagiarism_score = Math.round(parseFloat(plagiarism_score)) || 0;
 
-                await dbPool.query(query, [ai_score, plagiarism_score, fileName]);
+                // Update submission scores
+                await dbPool.query(updateSubmissionQuery, [ai_score, plagiarism_score, fileName]);
+                
+                // Update user scores based on plagiarism and AI scores
+                await dbPool.query(updateUserScoreQuery, [fileName]);
             }
+            
             const checkPlagiarismQuery = `
             UPDATE assignments
             set plagarism_check = TRUE
