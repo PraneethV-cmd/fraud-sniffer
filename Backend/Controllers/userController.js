@@ -17,8 +17,8 @@ const userController = {
     updateProfile: async(req, res) => {
         try {
             const userID = req.params.userID;
-            const { userName, password ,email } = req.body;
-            const response = await userModel.updateProfile(userID, userName, password, email);
+            const { username, password ,email } = req.body;
+            const response = await userModel.updateProfile(userID, username, password, email);
             res.status(response.code).json(response.body.message);
         } catch (err) {
             console.error("[Error in userController.updateProfile]", err);

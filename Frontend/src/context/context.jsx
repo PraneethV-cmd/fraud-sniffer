@@ -8,12 +8,14 @@ const ContextProvider = (props) => {
     const [assignmentList, setAssignmentList] = useState([]);
     const [managableAssignments, setManagableAssignments] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [userData, setUserData] = useState({});
 
     const contextValue = {
         value, setValue,
         assignmentList, setAssignmentList,
         managableAssignments, setManagableAssignments,
-        loading, setLoading
+        loading, setLoading,
+        userData, setUserData
     };
 
     return(

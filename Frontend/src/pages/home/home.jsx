@@ -12,7 +12,8 @@ const Home = () => {
     setValue,
     setAssignmentList,
     setManagableAssignments,
-    setLoading
+    setLoading,
+    setUserData
   } = useContext(Context);
 
   useEffect(() => {
@@ -57,7 +58,16 @@ const Home = () => {
       })
       .finally(() => {
         setLoading(false);
-      });
+    });
+
+    fetch(`http://localhost:8080/api/user/${userID}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+    })
+    .then((response) => response.json())
+    .then((data) => {
+      setUserData(data);
+    })
   }, []);
 
   useEffect(() => {

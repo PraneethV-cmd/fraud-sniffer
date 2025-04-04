@@ -24,19 +24,16 @@ import {
   Person as PersonIcon,
 } from "@mui/icons-material"
 import "./UserProfile.css"
+import { Context } from "../../context/context";
+import { useContext, useEffect } from "react";
 
 const UserProfile = () => {
-  // Mock user data (would come from API in a real app)
-  const [user, setUser] = useState({
-    userID: 1,
-    userName: "JohnDoe",
-    email: "john.doe@example.com",
-    score: 1250,
-    password: "********", // Placeholder for UI only
-  })
+  const {
+    userData, setUserData
+  } = useContext(Context);
 
   const [editMode, setEditMode] = useState(false)
-  const [editedUser, setEditedUser] = useState({ ...user })
+  const [editedUser, setEditedUser] = useState({ ...userData })
   const [showPassword, setShowPassword] = useState(false)
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -44,19 +41,11 @@ const UserProfile = () => {
     severity: "success",
   })
 
-  // Generate initials for avatar
-  const getInitials = (name) => {
-    return name
-      .split(" ")
-      .map((part) => part[0])
-      .join("")
-      .toUpperCase()
-  }
 
   const handleEditToggle = () => {
     if (editMode) {
       // Cancel edit
-      setEditedUser({ ...user })
+      setEditedUser({ ...userData })
     }
     setEditMode(!editMode)
   }
@@ -82,7 +71,7 @@ const UserProfile = () => {
     }
 
     // Validate username
-    if (editedUser.userName.trim().length < 3) {
+    if (editedUser.username.trim().length < 3) {
       setSnackbar({
         open: true,
         message: "Username must be at least 3 characters",
@@ -91,14 +80,31 @@ const UserProfile = () => {
       return
     }
 
-    // In a real app, you would send this data to your API
-    setUser({ ...editedUser })
-    setEditMode(false)
-    setSnackbar({
-      open: true,
-      message: "Profile updated successfully!",
-      severity: "success",
+    fetch(`http://localhost:8080/api/user/${userData.userid}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...editedUser }),
+
     })
+    .then((response) =>{
+      setUserData({ ...editedUser })
+      response.json()
+      setEditMode(false)
+      setSnackbar({
+        open: true,
+        message: "Profile updated successfully!",
+        severity: "success",
+      })
+    })
+    .catch((error) => {
+      console.error("Error updating profile:", error)
+      setSnackbar({
+        open: true,
+        message: "Failed to update profile",
+        severity: "error",
+      })
+    })
+    
   }
 
   const handleCloseSnackbar = () => {
@@ -133,22 +139,22 @@ const UserProfile = () => {
             <Card className="profile-card">
               <CardContent className="profile-card-content">
                 <Box className="avatar-container">
-                  <Avatar className="profile-avatar">{getInitials(user.userName)}</Avatar>
+                  <Avatar className="profile-avatar">{userData.username}</Avatar>
                 </Box>
                 <Typography variant="h5" component="h2" className="profile-name">
-                  {user.userName}
+                  {userData.username}
                 </Typography>
                 <Typography variant="body1" color="textSecondary" className="profile-email">
-                  {user.email}
+                  {userData.email}
                 </Typography>
                 <Box className="score-container">
                   <BadgeIcon color="primary" />
                   <Typography variant="h6" component="p" className="profile-score">
-                    Score: {user.score}
+                    Score: {userData.score}
                   </Typography>
                 </Box>
                 <Typography variant="body2" color="textSecondary" className="profile-id">
-                  User ID: {user.userID}
+                  User ID: {userData.userid}
                 </Typography>
               </CardContent>
             </Card>
@@ -172,8 +178,8 @@ const UserProfile = () => {
                         <TextField
                           fullWidth
                           label="Username"
-                          name="userName"
-                          value={editedUser.userName}
+                          name="username"
+                          value={editedUser.username}
                           onChange={handleInputChange}
                           variant="outlined"
                         />
@@ -182,7 +188,7 @@ const UserProfile = () => {
                           <Typography variant="body2" color="textSecondary">
                             Username
                           </Typography>
-                          <Typography variant="body1">{user.userName}</Typography>
+                          <Typography variant="body1">{userData.username}</Typography>
                         </Box>
                       )}
                     </Box>
@@ -208,7 +214,7 @@ const UserProfile = () => {
                           <Typography variant="body2" color="textSecondary">
                             Email
                           </Typography>
-                          <Typography variant="body1">{user.email}</Typography>
+                          <Typography variant="body1">{userData.email}</Typography>
                         </Box>
                       )}
                     </Box>
@@ -250,7 +256,7 @@ const UserProfile = () => {
                         <Typography variant="body2" color="textSecondary">
                           Score
                         </Typography>
-                        <Typography variant="body1">{user.score} points</Typography>
+                        <Typography variant="body1">{userData.score} points</Typography>
                         <Typography variant="caption" color="textSecondary">
                           (Score is calculated based on your activity and cannot be edited directly)
                         </Typography>
