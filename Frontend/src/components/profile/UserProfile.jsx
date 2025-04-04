@@ -13,6 +13,8 @@ import {
   Typography,
   Snackbar,
   Alert,
+  CircularProgress,
+  Tooltip,
 } from "@mui/material"
 import {
   Edit as EditIcon,
@@ -24,13 +26,47 @@ import {
   Person as PersonIcon,
 } from "@mui/icons-material"
 import "./UserProfile.css"
-import { Context } from "../../context/context";
-import { useContext, useEffect } from "react";
+import { Context } from "../../context/context"
+import { useContext } from "react"
+import { styled } from "@mui/material/styles"
+
+const ScoreGauge = styled(Box)(({ theme }) => ({
+  position: "relative",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  marginTop: theme.spacing(2),
+  marginBottom: theme.spacing(2),
+}))
+
+const ScoreLabel = styled(Typography)(({ theme, risk }) => ({
+  position: "absolute",
+  bottom: 0,
+  color: risk === "low" ? "#4caf50" : risk === "medium" ? "#ff9800" : "#f44336",
+  fontWeight: "bold",
+}))
+
+const ThresholdMarker = styled(Box)(({ theme, position, color }) => ({
+  position: "absolute",
+  width: "3px",
+  height: "10px",
+  backgroundColor: color,
+  bottom: "5px",
+  transform: `translateX(${position}px)`,
+}))
+
+const RiskIndicator = styled(Box)(({ theme, risk }) => ({
+  marginTop: theme.spacing(1),
+  padding: theme.spacing(0.5, 1.5),
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: risk === "low" ? "#e8f5e9" : risk === "medium" ? "#fff3e0" : "#ffebee",
+  color: risk === "low" ? "#2e7d32" : risk === "medium" ? "#e65100" : "#c62828",
+  fontWeight: "bold",
+  display: "inline-block",
+}))
 
 const UserProfile = () => {
-  const {
-    userData, setUserData
-  } = useContext(Context);
+  const { userData, setUserData } = useContext(Context)
 
   const [editMode, setEditMode] = useState(false)
   const [editedUser, setEditedUser] = useState({ ...userData })
@@ -41,6 +77,25 @@ const UserProfile = () => {
     severity: "success",
   })
 
+  const getRiskLevel = (score) => {
+    const normalizedScore = score > 1000 ? 1000 : score
+    if (normalizedScore < 400) return "high"
+    if (normalizedScore < 700) return "medium"
+    return "low"
+  }
+
+  const getColorForRisk = (risk) => {
+    switch (risk) {
+      case "low":
+        return "#4caf50" // green
+      case "medium":
+        return "#ff9800" // orange
+      case "high":
+        return "#f44336" // red
+      default:
+        return "#4caf50"
+    }
+  }
 
   const handleEditToggle = () => {
     if (editMode) {
@@ -81,30 +136,28 @@ const UserProfile = () => {
     }
 
     fetch(`http://localhost:8080/api/user/${userData.userid}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...editedUser }),
-
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...editedUser }),
     })
-    .then((response) =>{
-      setUserData({ ...editedUser })
-      response.json()
-      setEditMode(false)
-      setSnackbar({
-        open: true,
-        message: "Profile updated successfully!",
-        severity: "success",
+      .then((response) => {
+        setUserData({ ...editedUser })
+        response.json()
+        setEditMode(false)
+        setSnackbar({
+          open: true,
+          message: "Profile updated successfully!",
+          severity: "success",
+        })
       })
-    })
-    .catch((error) => {
-      console.error("Error updating profile:", error)
-      setSnackbar({
-        open: true,
-        message: "Failed to update profile",
-        severity: "error",
+      .catch((error) => {
+        console.error("Error updating profile:", error)
+        setSnackbar({
+          open: true,
+          message: "Failed to update profile",
+          severity: "error",
+        })
       })
-    })
-    
   }
 
   const handleCloseSnackbar = () => {
@@ -153,6 +206,60 @@ const UserProfile = () => {
                     Score: {userData.score}
                   </Typography>
                 </Box>
+
+                <ScoreGauge>
+                  <Tooltip title={`${userData.score} out of 1000`} arrow>
+                    <Box sx={{ position: "relative", display: "inline-flex" }}>
+                      <CircularProgress
+                        variant="determinate"
+                        value={(userData.score / 1000) * 100}
+                        size={120}
+                        thickness={5}
+                        sx={{
+                          color: getColorForRisk(getRiskLevel(userData.score)),
+                          "& .MuiCircularProgress-circle": {
+                            strokeLinecap: "round",
+                          },
+                        }}
+                      />
+                      <Box
+                        sx={{
+                          top: 0,
+                          left: 0,
+                          bottom: 0,
+                          right: 0,
+                          position: "absolute",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Typography variant="h5" component="div" color="text.secondary" fontWeight="bold">
+                          {userData.score}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Tooltip>
+                  <Box sx={{ width: "100%", mt: 1, display: "flex", justifyContent: "center", position: "relative" }}>
+                    <ThresholdMarker position={-40} color="#f44336" />
+                    <ThresholdMarker position={0} color="#ff9800" />
+                    <ThresholdMarker position={40} color="#4caf50" />
+                  </Box>
+                  <Box sx={{ mt: 1, display: "flex", justifyContent: "space-between", width: "100%" }}>
+                    <Typography variant="caption" color="error">
+                      High Risk
+                    </Typography>
+                    <Typography variant="caption" color="warning.main">
+                      Medium
+                    </Typography>
+                    <Typography variant="caption" color="success.main">
+                      Low Risk
+                    </Typography>
+                  </Box>
+                  <RiskIndicator risk={getRiskLevel(userData.score)}>
+                    {getRiskLevel(userData.score).toUpperCase()} RISK
+                  </RiskIndicator>
+                </ScoreGauge>
                 <Typography variant="body2" color="textSecondary" className="profile-id">
                   User ID: {userData.userid}
                 </Typography>
@@ -257,7 +364,45 @@ const UserProfile = () => {
                           Score
                         </Typography>
                         <Typography variant="body1">{userData.score} points</Typography>
-                        <Typography variant="caption" color="textSecondary">
+                        <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
+                          <Box
+                            sx={{
+                              width: "100%",
+                              height: "8px",
+                              borderRadius: "4px",
+                              background:
+                                "linear-gradient(90deg, #f44336 0%, #f44336 40%, #ff9800 40%, #ff9800 70%, #4caf50 70%, #4caf50 100%)",
+                              position: "relative",
+                            }}
+                          >
+                            <Box
+                              sx={{
+                                position: "absolute",
+                                height: "16px",
+                                width: "4px",
+                                backgroundColor: "#000",
+                                top: "-4px",
+                                left: `${(userData.score / 1000) * 100}%`,
+                                transform: "translateX(-50%)",
+                              }}
+                            />
+                          </Box>
+                        </Box>
+                        <Box sx={{ display: "flex", justifyContent: "space-between", width: "100%", mt: 0.5 }}>
+                          <Typography variant="caption" color="error">
+                            0
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            400
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            700
+                          </Typography>
+                          <Typography variant="caption" color="success.main">
+                            1000
+                          </Typography>
+                        </Box>
+                        <Typography variant="caption" color="textSecondary" sx={{ mt: 1, display: "block" }}>
                           (Score is calculated based on your activity and cannot be edited directly)
                         </Typography>
                       </Box>
