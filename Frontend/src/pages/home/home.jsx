@@ -5,6 +5,7 @@ import TemporaryDrawer from "../../components/sidebar";
 import Notifications from "../../components/notifications";
 import Profile from "../../components/profile/UserProfile";
 import { Context } from "../../context/context";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const [activeTab, setActiveTab] = useState("Home");
@@ -15,9 +16,12 @@ const Home = () => {
     setLoading,
     setUserData
   } = useContext(Context);
+  
+  const navigate = useNavigate();
 
   useEffect(() => {
     const userID = sessionStorage.getItem("userID");
+    if(userID === null) navigate("/login")
     setLoading(true);
 
     Promise.all([

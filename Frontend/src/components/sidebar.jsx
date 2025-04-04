@@ -21,6 +21,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons"
 import { useNavigate } from "react-router-dom"
 import { Typography, Avatar, Divider, Tooltip } from "@mui/material"
+import { Context } from "../context/context";
+import { useContext } from "react";
 
 const menuItems = [
   { text: "Home", icon: faHome, color: "#4caf50" },
@@ -34,16 +36,11 @@ const menuItems = [
 export default function CustomDrawer({ onMenuClick }) {
   const [open, setOpen] = useState(false)
   const [activeItem, setActiveItem] = useState("Home")
-  const [userName, setUserName] = useState("Student")
   const navigate = useNavigate()
-
-  // Get user name from session storage if available
-  useEffect(() => {
-    const storedName = sessionStorage.getItem("userName")
-    if (storedName) {
-      setUserName(storedName)
-    }
-  }, [])
+  const {
+    userData
+  } = useContext(Context);
+  const { username } = userData;
 
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen)
@@ -57,16 +54,6 @@ export default function CustomDrawer({ onMenuClick }) {
       navigate("/login")
     }
     onMenuClick(text)
-  }
-
-  // Get user initials for avatar
-  const getInitials = (name) => {
-    return name
-      .split(" ")
-      .map((word) => word[0])
-      .join("")
-      .toUpperCase()
-      .substring(0, 2)
   }
 
   // Custom styles
@@ -130,7 +117,7 @@ export default function CustomDrawer({ onMenuClick }) {
       boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
       border: "3px solid rgba(255,255,255,0.2)",
     },
-    userName: {
+    username: {
       fontWeight: "bold",
       fontSize: "1.2rem",
       marginBottom: "4px",
@@ -215,9 +202,8 @@ export default function CustomDrawer({ onMenuClick }) {
       {/* Header with user info */}
       <Box sx={styles.header}>
         <Box sx={styles.headerBackground} />
-        <Avatar sx={styles.avatar}>{getInitials(userName)}</Avatar>
-        <Typography sx={styles.userName}>{userName}</Typography>
-        <Typography sx={styles.userRole}>Student</Typography>
+        <Avatar sx={styles.avatar}>{username}</Avatar>
+        <Typography sx={styles.username}>{username}</Typography>
       </Box>
 
       {/* Menu items */}
@@ -274,7 +260,6 @@ export default function CustomDrawer({ onMenuClick }) {
             Classroom Manager
           </Typography>
         </Box>
-        <Typography variant="caption">© {new Date().getFullYear()} All Rights Reserved</Typography>
       </Box>
     </Box>
   )
